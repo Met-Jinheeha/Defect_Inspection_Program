@@ -22,10 +22,17 @@
             <Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1">
                 <DockPanel LastChildFill="True">
                     <Button DockPanel.Dock="Bottom" Content="폴더선택" Click="OpenFolderButton_Click" Width="75" Height="30" Margin="5"/>
-                    <ListBox x:Name="ListBox" Margin="5"/>
+                    <ListBox x:Name="ListBox" Margin="5" SelectionChanged="ListBox_SelectionChanged" />
                 </DockPanel>
             </Border>
-            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1"/>
+            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+                <DockPanel LastChildFill="True" Margin="0.2,0.2,0,-0.2">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="TextBlock" Margin="5,0" TextWrapping="Wrap" Height="52"/>
+                    </ScrollViewer>
+
+                </DockPanel>
+            </Border>
         </Grid>
     </Grid>
 </Window>

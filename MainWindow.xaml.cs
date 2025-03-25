@@ -2,7 +2,8 @@
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Diagnostics;
+using System;
+
 
 namespace DefectViewProgram
 {
@@ -16,9 +17,19 @@ namespace DefectViewProgram
             InitializeComponent();
         }
 
+        private string currentFolderPath;
+
+        private string fullPath;
+        public string FullPath
+        {
+            get; set;
+        }
+
+
         /// <summary>
         /// 폴더 패스를 이용해서 폴더 내부의 파일을 보여주게 하는 함수 호출하는 이벤트 핸들러
         /// </summary>
+        /// 
         private void OpenFolderButton_Click(object sender, RoutedEventArgs e)
         {
             string selectedFolderPath = GetSelectedFolderPath();
@@ -26,12 +37,15 @@ namespace DefectViewProgram
             {
                 System.Windows.MessageBox.Show("선택한 폴더: " + selectedFolderPath, "폴더 선택 완료");
                 DisplayFileList(selectedFolderPath);
+                currentFolderPath = selectedFolderPath;
             }
         }
+
 
         /// <summary>
         /// 폴더 Path 가져오는 함수
         /// </summary>
+        /// 
         private string GetSelectedFolderPath()
         {
             using (var folderBrowswerDialog = new FolderBrowserDialog())
@@ -51,7 +65,9 @@ namespace DefectViewProgram
 
         /// <summary>
         /// 폴더 내부 파일들의 이름을 보여주는 함수
+        /// 이거 일단 보류
         /// </summary>
+        /// 
         private void DisplayFileList(string folderPath)
         {
             string[] files = Directory.GetFiles(folderPath);
@@ -62,7 +78,7 @@ namespace DefectViewProgram
             foreach (string directoryPath in directories)
             {
                 DirectoryInfo directoryInfo = new DirectoryInfo(directoryPath);
-                ListBox.Items.Add($"폴더: {directoryInfo.Name}");
+                ListBox.Items.Add(directoryInfo.Name);
             }
 
             foreach (string file in files)
@@ -73,7 +89,33 @@ namespace DefectViewProgram
                 {
                     revisedName = fileInfo.Name.Substring(2);
                 }
-                ListBox.Items.Add($"파일: {revisedName}");
+                ListBox.Items.Add(revisedName);
+            }
+
+            KlarfFileParser parser = new KlarfFileParser();
+            parser.ParseText(fullPath); // 스트링
+            TextBlock.Text = parser.ParsedContent;
+        }
+
+        /// <summary>
+        /// 리스트 박스에 있는걸 클릭했을 때 파싱해주는 함수
+        /// </summary>
+        /// 
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ListBox.SelectedItem != null)
+            {
+                string selectedFileName = ListBox.SelectedItem.ToString();
+                Console.WriteLine(selectedFileName);
+                fullPath = Path.Combine(currentFolderPath, selectedFileName);
+
+                Console.WriteLine(fullPath);
+
+                KlarfFileParser parser = new KlarfFileParser();
+                parser.ParseText(fullPath); // 스트링
+                TextBlock.Text = parser.ParsedContent;
+
+             
             }
         }
     }
