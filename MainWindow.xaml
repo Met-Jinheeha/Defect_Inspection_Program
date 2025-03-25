@@ -7,14 +7,25 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Grid HorizontalAlignment="Left" Height="190" Margin="0,220,0,0" VerticalAlignment="Top" Width="361" RenderTransformOrigin="0.479,-1.079" OpacityMask="#FFCB1616">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="207" VerticalAlignment="Top" Width="400" Margin="4,-212,-43.2,0" Grid.ColumnSpan="7"/>
-            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="197" VerticalAlignment="Top" Width="400" Margin="4,0,-43.2,-7" Grid.ColumnSpan="7"/>
-            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="197" VerticalAlignment="Top" Width="381" Margin="409,0,-429,-7"/>
-            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="207" VerticalAlignment="Top" Width="381" Margin="409,-212,-429,0"/>
-        </Grid>
 
+            <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1"/>
+            <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1"/>
+            <Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1">
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Bottom" Content="폴더선택" Click="OpenFolderButton_Click" Width="75" Height="30" Margin="5"/>
+                    <ListBox x:Name="ListBox" Margin="5"/>
+                </DockPanel>
+            </Border>
+            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1"/>
+        </Grid>
     </Grid>
 </Window>
