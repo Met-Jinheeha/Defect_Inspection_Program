@@ -58,59 +58,5 @@ namespace DefectViewProgram
         {
             return chipDefects;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //public List<string[]> GetDefectList(string content)
-        //{
-        //    List<string[]> defects = new List<string[]>();
-
-        //    string[] lines = content.Split('\n'); // 본문 내용을 줄 단위로 배열화 시킴
-
-        //    // "DefectList"가 있는 줄 찾기
-        //    int defectListLine = -1;
-        //    for (int i = 0; i < lines.Length; i++)
-        //    {
-        //        if (lines[i].Contains("DefectList"))
-        //        {
-        //            defectListLine = i;
-        //            break;
-        //        }
-        //    }
-
-        //    // 찾은 줄 다음부터 처리 시작
-        //    if (defectListLine != -1)
-        //    {
-        //        for (int i = defectListLine + 1; i < lines.Length-4; i = i+2)
-        //        {
-        //            Console.WriteLine(lines[i]);
-        //            string[] defectInfo = lines[i].Split(' '); // 디펙하나 483개 중에 한줄
-        //            defects.Add(defectInfo); // 디펙 정보배열 리스트 483개의 전체 줄
-        //        }
-        //    }
-        //    return defects;
-        //}
     }
 }       
