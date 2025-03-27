@@ -99,16 +99,6 @@ namespace DefectViewProgram
         /// 
 
 
-
-        //public Dictionary<Point, List<DefectInfo>> GetAllDefects()
-        //{
-        //    return chipDefects;
-        //}
-
-
-
-
-
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ListBox.SelectedItem != null)
@@ -121,7 +111,6 @@ namespace DefectViewProgram
                 KlarfFileParser parser = new KlarfFileParser();
 
                 ChipInfo chip = new ChipInfo();
-                DefectInfo defect = new DefectInfo();
 
                 parser.ParseText(FullPath);
 
