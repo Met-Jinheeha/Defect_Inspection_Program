@@ -8,13 +8,18 @@ namespace DefectViewProgram
 {
     class Point
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
 
         public Point(int x, int y)
         {
-            X = x;
-            Y = y;
+            this.x = x;
+            this.y = y;
+        }
+
+        public override string ToString()
+        {
+            return $"{this.x},{this.y}";
         }
     }
 }

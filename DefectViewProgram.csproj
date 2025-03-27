@@ -64,6 +64,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ChipInfo.cs" />
+    <Compile Include="WaferInfo.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="DefectInfo.cs" />
     <Compile Include="KlarfFileParser.cs" />

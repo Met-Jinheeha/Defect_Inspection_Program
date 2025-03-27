@@ -26,12 +26,42 @@
                 </DockPanel>
             </Border>
             <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
-                <DockPanel LastChildFill="True" Margin="0.2,0.2,0,-0.2">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <TextBlock x:Name="TextBlock" Margin="5,0" TextWrapping="Wrap" Height="52"/>
-                    </ScrollViewer>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                </DockPanel>
+                    <!-- 상단 영역: 디펙 제어 UI -->
+                    <Grid Grid.Row="0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Button Content="◀" Width="40" Height="30" Margin="5"/>
+                            <TextBlock Text="전체 디펙: 1/10" VerticalAlignment="Center" Margin="10,0"/>
+                            <Button Content="▶" Width="40" Height="30" Margin="5"/>
+
+                            <Separator Width="20" Margin="10,0"/>
+
+                            <Button Content="◀" Width="40" Height="30" Margin="5"/>
+                            <TextBlock Text="다이별: 1/5" VerticalAlignment="Center" Margin="10,0"/>
+                            <Button Content="▶" Width="40" Height="30" Margin="5"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 하단 영역: 데이터그리드 -->
+                    <DockPanel Grid.Row="1" LastChildFill="True">
+                        <DataGrid x:Name="defectList" AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Path=id}" Width="50"/>
+                                <DataGridTextColumn Header="XREL" Binding="{Binding Path=xrel}" Width="100"/>
+                                <DataGridTextColumn Header="YREL" Binding="{Binding Path=yrel}" Width="100"/>
+                                <DataGridTextColumn Header="XIndex" Binding="{Binding Path=xindex}" Width="50"/>
+                                <DataGridTextColumn Header="YIndex" Binding="{Binding Path=yindex}" Width="50"/>
+                                <DataGridTextColumn Header="xSize" Binding="{Binding Path=xsize}" Width="50"/>
+                                <DataGridTextColumn Header="ySize" Binding="{Binding Path=ysize}" Width="50"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Grid>
             </Border>
         </Grid>
     </Grid>

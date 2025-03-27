@@ -9,54 +9,45 @@ namespace DefectViewProgram
 {
     class DefectInfo
     {
-        public int DefectId { get; set; }
+        public int defectId { get; set; }
 
-        public double XRel { get; set; }
+        public double xRel { get; set; }
 
-        public double YRel { get; set; }
+        public double yRel { get; set; }
 
-        public int XSize { get; set; }
+        public int xIndex { get; set; }
 
-        public int YSize { get; set; }
+        public int yIndex { get; set; }
+
+        public int xSize { get; set; }
+
+        public int ySize { get; set; }
 
 
         public DefectInfo(string[] content)
         {
             // 디펙 객체 초기화
-            DefectId = int.Parse(content[0]);
-            XRel = double.Parse(content[1], System.Globalization.NumberStyles.Float);
-            YRel = double.Parse(content[2], System.Globalization.NumberStyles.Float);
-            XSize = int.Parse(content[5]);
-            YSize = int.Parse(content[6]);
+            defectId = int.Parse(content[0]);
+            xRel = double.Parse(content[1], System.Globalization.NumberStyles.Float);
+            yRel = double.Parse(content[2], System.Globalization.NumberStyles.Float);
+            xIndex = int.Parse(content[3]);
+            yIndex = int.Parse(content[4]);
+            xSize = int.Parse(content[5]);
+            ySize = int.Parse(content[6]);
+        }
+        public DefectInfo()
+        { 
         }
 
-        private Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
-
-        public void AddDefect(int xIndex, int yIndex, string[] defectData)
+        public override string ToString()
         {
-            Point chipPoint = new Point(xIndex, yIndex);
-            DefectInfo defect = new DefectInfo(defectData);
-
-            if (!chipDefects.ContainsKey(chipPoint))
-                chipDefects[chipPoint] = new List<DefectInfo>();
-
-            chipDefects[chipPoint].Add(defect);
+            return $"{defectId},{xRel},{yRel},{xIndex},{yIndex},{xSize},{ySize}";
         }
 
-        public List<DefectInfo> GetDefects(int xIndex, int yIndex)
+        public void WriteDefectInfo(DefectInfo defectInfo)
         {
-            Point chipPoint = new Point(xIndex, yIndex);
-
-            if (chipDefects.ContainsKey(chipPoint))
-                return chipDefects[chipPoint];
-
-            return new List<DefectInfo>();
-        }
-
-
-        public Dictionary<Point, List<DefectInfo>> GetAllDefects()
-        {
-            return chipDefects;
+            ChipInfo chipInfo = new ChipInfo(xIndex, yIndex);
+            chipInfo.AddDefect(defectInfo);
         }
     }
 }       

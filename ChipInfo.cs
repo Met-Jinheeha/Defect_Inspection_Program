@@ -8,10 +8,9 @@ namespace DefectViewProgram
 {
     class ChipInfo
     {
-
         public Point ChipIndex
         {
-            get; private set;
+            get; set;
         }
 
         public ChipInfo(int x, int y)
@@ -19,18 +18,28 @@ namespace DefectViewProgram
             ChipIndex = new Point(x, y);
         }
 
-        private Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
-
-        public void AddDefect(int xIndex, int yIndex, string[] defectData)
+        public ChipInfo()
         {
-            Point chipPoint = new Point(xIndex, yIndex);
-            DefectInfo defect = new DefectInfo(defectData);
 
-            if (!chipDefects.ContainsKey(chipPoint))
-                chipDefects[chipPoint] = new List<DefectInfo>();
-
-            chipDefects[chipPoint].Add(defect);
         }
+
+        private static Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
+
+
+        public override string ToString()
+        {
+            return $"{ChipIndex.x},{ChipIndex.y},{chipDefects.Values}";
+        }
+
+        public void AddDefect(DefectInfo defectData)
+        {
+            if (!chipDefects.ContainsKey(ChipIndex))
+            {
+                chipDefects[ChipIndex] = new List<DefectInfo>();
+            }
+            chipDefects[ChipIndex].Add(defectData);
+        }
+
 
         public List<DefectInfo> GetDefects(int xIndex, int yIndex)
         {
@@ -42,9 +51,24 @@ namespace DefectViewProgram
             return new List<DefectInfo>();
         }
 
-        public Dictionary<Point, List<DefectInfo>> GetAllDefects()
+        public string GetAll()
         {
-            return chipDefects;
+            return chipDefects.ToString();
+        }
+
+
+        public string GetAllDefects()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var kvp in chipDefects)
+            {
+                sb.AppendLine($"{kvp.Key},{string.Join(",", kvp.Value)}");
+            }
+
+            string result = sb.ToString();
+            Console.WriteLine(result);
+            return result;
         }
     }
 }
