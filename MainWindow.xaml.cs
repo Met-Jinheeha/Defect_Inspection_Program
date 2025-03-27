@@ -3,7 +3,8 @@ using System.IO;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System;
-
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DefectViewProgram
 {
@@ -18,12 +19,7 @@ namespace DefectViewProgram
         }
 
         private string currentFolderPath;
-
-        private string fullPath;
-        public string FullPath
-        {
-            get; set;
-        }
+        public string FullPath { get; set; }
 
 
         /// <summary>
@@ -93,29 +89,79 @@ namespace DefectViewProgram
             }
 
             KlarfFileParser parser = new KlarfFileParser();
-            parser.ParseText(fullPath); // 스트링
-            TextBlock.Text = parser.ParsedContent;
+            parser.ParseText(FullPath); // 스트링
+            //TextBlock.Text = parser.ParsedContent;
         }
 
         /// <summary>
         /// 리스트 박스에 있는걸 클릭했을 때 파싱해주는 함수
         /// </summary>
         /// 
+
+
+
+        //public Dictionary<Point, List<DefectInfo>> GetAllDefects()
+        //{
+        //    return chipDefects;
+        //}
+
+
+
+
+
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ListBox.SelectedItem != null)
             {
                 string selectedFileName = ListBox.SelectedItem.ToString();
-                Console.WriteLine(selectedFileName);
-                fullPath = Path.Combine(currentFolderPath, selectedFileName);
+                FullPath = Path.Combine(currentFolderPath, selectedFileName);
 
-                Console.WriteLine(fullPath);
+                Console.WriteLine(FullPath);
 
                 KlarfFileParser parser = new KlarfFileParser();
-                parser.ParseText(fullPath); // 스트링
-                TextBlock.Text = parser.ParsedContent;
 
-             
+                ChipInfo chip = new ChipInfo();
+                DefectInfo defect = new DefectInfo();
+
+                parser.ParseText(FullPath);
+
+                string defectInfo = chip.GetAllDefects();
+
+                ObservableCollection<object> items = new ObservableCollection<object>();
+
+                string[] lines = defectInfo.Split('\n');
+
+                Console.WriteLine("라인" + lines[1]);
+
+
+                foreach (string line in lines)
+                {
+                    string[] parts = line.Split(',');
+
+                    // 먼저 길이 확인 후 parts[1] 접근
+                    if (parts.Length > 1)
+                    {
+                        Console.WriteLine("파트" + parts[1]);
+                    }
+
+                    if (parts.Length < 7) continue;
+
+                    // 익명 객체 사용
+                    items.Add(new
+                    {
+                        id = parts[2],
+                        xrel = parts[3],
+                        yrel = parts[4],
+                        xindex = parts[5],
+                        yindex = parts[6],
+                        xsize = parts[7],
+                        ysize = parts[8]
+                    });
+                }
+
+                defectList.ItemsSource = items;
+
+                Console.WriteLine(items);
             }
         }
     }

@@ -11,11 +11,9 @@ namespace DefectViewProgram
     {
         public string ParsedContent { get; private set; }
 
-        public override string ToString()
-        {
-            return base.ToString();
-        }
+        string[] defectInfo = new string[20];
 
+        //public static List<string> list = new List<string>();
 
 
         public void ParseText(string filePath)
@@ -41,8 +39,6 @@ namespace DefectViewProgram
                 }
             }
 
-            string[] defectInfo = new string[20];
-
             // 찾은 줄 다음부터 처리 시작
             if (defectListLine != -1)
             {
@@ -52,15 +48,12 @@ namespace DefectViewProgram
                     defectInfo = lines[i].Split(' '); // 디펙하나 483개 중에 한줄
                     //defects.Add(defectInfo);
 
-                    int indexX = int.Parse(defectInfo[3]);
-                    int indexY = int.Parse(defectInfo[4]);
+                    //list.Add(lines[i]);
 
-                    DefectInfo defectDetails = new DefectInfo(defectInfo);
-
-                    defectDetails.AddDefect(indexX, indexY, defectInfo);
+                    DefectInfo defectDetails = new DefectInfo(defectInfo); // Defect 정보를 반복적으로 초기화
+                    defectDetails.WriteDefectInfo(defectDetails);
                 }
             }
-            
         }
     }
 }
