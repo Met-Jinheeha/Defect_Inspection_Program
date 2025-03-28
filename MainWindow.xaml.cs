@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Media.Imaging;
 
 namespace DefectViewProgram
 {
@@ -36,7 +37,6 @@ namespace DefectViewProgram
                 currentFolderPath = selectedFolderPath;
             }
         }
-
 
         /// <summary>
         /// 폴더 Path 가져오는 함수
@@ -97,18 +97,6 @@ namespace DefectViewProgram
         /// 리스트 박스에 있는걸 클릭했을 때 파싱해주는 함수
         /// </summary>
         /// 
-
-
-
-        //public Dictionary<Point, List<DefectInfo>> GetAllDefects()
-        //{
-        //    return chipDefects;
-        //}
-
-
-
-
-
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ListBox.SelectedItem != null)
@@ -121,7 +109,6 @@ namespace DefectViewProgram
                 KlarfFileParser parser = new KlarfFileParser();
 
                 ChipInfo chip = new ChipInfo();
-                DefectInfo defect = new DefectInfo();
 
                 parser.ParseText(FullPath);
 
@@ -131,7 +118,7 @@ namespace DefectViewProgram
 
                 string[] lines = defectInfo.Split('\n');
 
-                Console.WriteLine("라인" + lines[1]);
+                //Console.WriteLine("라인" + lines[1]);
 
 
                 foreach (string line in lines)
@@ -161,8 +148,201 @@ namespace DefectViewProgram
 
                 defectList.ItemsSource = items;
 
+                //currentFrameIndex = 0;
+
                 Console.WriteLine(items);
             }
+        }
+
+        // 이벤트 핸들러
+        //private void NextDefectOnChipButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (crtDefectIdxOnChip < chipInfo.DefectList.Count - 1)
+        //    {
+        //        crtDefectIdxOnChip++;
+        //        UpdateUI();
+        //    }
+        //}
+
+        //private void PreviousDefectOnChipButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (crtDefectIdxOnChip > 0)
+        //    {
+        //        crtDefectIdxOnChip--;
+        //        UpdateUI();
+        //    }
+        //}
+
+        private void TransferCoordinateButton_Click(object sender, RoutedEventArgs e)
+        {
+            string temp = transferCoordinate1.Text;
+            string[] tempArr = temp.Split(',');
+
+            for (int i = 0; i < tempArr.Length; i++)
+            {
+                tempArr[i] = tempArr[i].Trim();
+            }
+
+            int x = int.Parse(tempArr[0]);
+            int y = int.Parse(tempArr[1]);
+
+            
+            ChipInfo chip = new ChipInfo();
+           
+            ObservableCollection<object> items = new ObservableCollection<object>();
+
+            List<DefectInfo> defectInfo = chip.GetDefects(x, y);
+            
+            for(int i = 0; i < defectInfo.Count; i++)
+            {
+                items.Add(new
+                {
+                    id = defectInfo[i].defectId,
+                    xrel = defectInfo[i].xRel,
+                    yrel = defectInfo[i].yRel,
+                    xindex = defectInfo[i].xIndex,
+                    yindex = defectInfo[i].yIndex,
+                    xsize = defectInfo[i].xSize,
+                    ysize = defectInfo[i].ySize
+                });
+            }
+
+            defectList.ItemsSource = items;
+
+            Console.WriteLine(items);
+        }
+
+        int currentWaferIndex = 0;
+       
+        private void NextDefectOnWholeWaferButton_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Next");
+
+            currentWaferIndex++;
+            int count = defectList.Items.Count;
+
+            defectList.SelectedIndex = currentWaferIndex;
+
+            txtDefectOnWafer.Text =  $"전체 디펙: {currentWaferIndex + 1}/{count}";
+
+            LoadDefectImageFromSelected();
+        }
+
+        private void PreviousDefectOnWholeWaferButton_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Previous");
+
+            currentWaferIndex--;
+            int count = defectList.Items.Count;
+
+            defectList.SelectedIndex = currentWaferIndex;
+
+            txtDefectOnWafer.Text = $"전체 디펙: {currentWaferIndex + 1}/{count}";
+
+            LoadDefectImageFromSelected();
+        }
+
+
+        //// UI 업데이트 통합 메서드
+        //private void UpdateUI()
+        //{
+        //    // 데이터그리드 업데이트
+        //    defectList.ItemsSource = chipInfo.DefectList;
+        //    defectList.SelectedIndex = crtDefectIdxOnChip;
+
+        //    // 카운터 텍스트 업데이트
+        //    txtDefectOnChip.Text = $"칩 내 디펙: {crtDefectIdxOnChip + 1}/{chipInfo.DefectList.Count}";
+        //    txtDefectOnWafer.Text = $"웨이퍼 내 디펙: {crtDefectIdxOnWafer + 1}/{waferInfo.TotalDefects}";
+
+        //    // 이미지 업데이트
+        //    LoadDefectImage();
+        //}
+
+
+
+        //private void UpdateCurrentChipFromWaferDefect()
+        //{
+        //    // 웨이퍼 인덱스에 해당하는 칩으로 이동
+        //    Point defectChipIndex = waferInfo.GetChipIndexFromDefectId(crtDefectIdxOnWafer);
+        //    currentChipIndex = defectChipIndex;
+
+        //    // 해당 칩에서의 결함 인덱스 찾기
+        //    chipInfo = waferInfo.GetChipInfo(currentChipIndex);
+        //    crtDefectIdxOnChip = chipInfo.GetLocalDefectIndex(crtDefectIdxOnWafer);
+        //}
+
+        private TiffBitmapDecoder currentDecoder;
+        private List<BitmapSource> tiffFrames = new List<BitmapSource>();
+        private int currentFrameIndex = 0;
+
+        private void LoadDefectImageFromSelected()
+        {
+            if (defectList.SelectedItem != null)
+            {
+                // 동적 객체에서 id 속성 가져오기
+                dynamic selectedItem = defectList.SelectedItem;
+                string defectId = selectedItem.id;
+
+                // ID로 tif 파일 경로 생성
+                string imagePath = Path.Combine(currentFolderPath, $"Klarf Format.tif");
+
+                if (File.Exists(imagePath))
+                {
+                    try
+                    {
+                        // 기존 프레임 목록 초기화
+                        tiffFrames.Clear();
+
+                        // TiffBitmapDecoder를 사용하여 멀티페이지 TIFF 로드
+                        currentDecoder = new TiffBitmapDecoder(
+                            new Uri(imagePath, UriKind.Absolute),
+                            BitmapCreateOptions.PreservePixelFormat,
+                            BitmapCacheOption.OnLoad);
+
+                        // 모든 프레임을 리스트에 저장
+                        foreach (BitmapFrame frame in currentDecoder.Frames)
+                        {
+                            tiffFrames.Add(frame);
+                        }
+
+                        // 프레임이 있으면 첫 번째 프레임 표시
+                        if (tiffFrames.Count > 0)
+                        {
+                            currentFrameIndex++;
+                            defectImage.Source = tiffFrames[currentFrameIndex];
+
+                            // 프레임 개수에 따라 UI 업데이트 (페이지 표시 등)
+                            UpdateFrameNavigationUI();
+                        }
+                        else
+                        {
+                            defectImage.Source = null;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"이미지 로드 오류: {ex.Message}");
+                        defectImage.Source = null;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"이미지 파일이 존재하지 않음: {imagePath}");
+                    defectImage.Source = null;
+                    tiffFrames.Clear();
+                    UpdateFrameNavigationUI();
+                }
+            }
+        }
+        // 이미지 탐색 UI 업데이트 메서드
+        private void UpdateFrameNavigationUI()
+        {
+            // 여기서 페이지 수 표시 등의 UI 업데이트
+            // 예: pageInfoTextBlock.Text = $"페이지 {currentFrameIndex + 1}/{tiffFrames.Count}";
+
+            // 페이지 네비게이션 버튼 활성화/비활성화 설정
+            // 예: prevButton.IsEnabled = (currentFrameIndex > 0);
+            // 예: nextButton.IsEnabled = (currentFrameIndex < tiffFrames.Count - 1);
         }
     }
 }

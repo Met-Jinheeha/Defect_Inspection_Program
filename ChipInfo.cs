@@ -40,16 +40,32 @@ namespace DefectViewProgram
             chipDefects[ChipIndex].Add(defectData);
         }
 
+        //public List<DefectInfo> GetDefects(int xIndex, int yIndex)
+        //{
+        //    Point chipPoint = new Point(xIndex, yIndex);
+
+        //    if (chipDefects.ContainsKey(chipPoint))
+        //        return chipDefects[chipPoint];
+
+        //    return new List<DefectInfo>();
+        //}
+
 
         public List<DefectInfo> GetDefects(int xIndex, int yIndex)
         {
-            Point chipPoint = new Point(xIndex, yIndex);
+            List<DefectInfo> result = new List<DefectInfo>();
 
-            if (chipDefects.ContainsKey(chipPoint))
-                return chipDefects[chipPoint];
-
-            return new List<DefectInfo>();
+            foreach (var entry in chipDefects)
+            {
+                Point key = entry.Key;
+                if ((int)key.x == xIndex && (int)key.y == yIndex)
+                {
+                    result.AddRange(entry.Value);
+                }
+            }
+            return result;
         }
+
 
         public string GetAll()
         {

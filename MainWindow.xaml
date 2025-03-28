@@ -18,7 +18,12 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1"/>
-            <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1"/>
+
+            <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+                <Image x:Name="defectImage" Stretch="Uniform"/>
+            </Border>
+        
+
             <Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1">
                 <DockPanel LastChildFill="True">
                     <Button DockPanel.Dock="Bottom" Content="폴더선택" Click="OpenFolderButton_Click" Width="75" Height="30" Margin="5"/>
@@ -35,15 +40,18 @@
                     <!-- 상단 영역: 디펙 제어 UI -->
                     <Grid Grid.Row="0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Button Content="◀" Width="40" Height="30" Margin="5"/>
-                            <TextBlock Text="전체 디펙: 1/10" VerticalAlignment="Center" Margin="10,0"/>
-                            <Button Content="▶" Width="40" Height="30" Margin="5"/>
+                            <Button Content="◀" Width="40" Height="30" Margin="5" Click="PreviousDefectOnWholeWaferButton_Click"/>
+                            <TextBlock x:Name="txtDefectOnWafer" Text="전체 디펙: 1/10" VerticalAlignment="Center" Margin="10,0"/>
+                            <Button Content="▶" Width="40" Height="30" Margin="5" Click="NextDefectOnWholeWaferButton_Click"/>
 
                             <Separator Width="20" Margin="10,0"/>
 
                             <Button Content="◀" Width="40" Height="30" Margin="5"/>
-                            <TextBlock Text="다이별: 1/5" VerticalAlignment="Center" Margin="10,0"/>
+                            <TextBlock x:Name="txtDefectOnWholeWafer" Text="칩 내 디펙: 1/10" VerticalAlignment="Center" Margin="10,0"/>
                             <Button Content="▶" Width="40" Height="30" Margin="5"/>
+
+                            <TextBox x:Name="transferCoordinate1" Text="fdfsdfdsfs" VerticalAlignment="Center" Margin="10,0"/>
+                            <Button  x:Name="transferCoordinate2" Content="칩 Defect 조회" Width="40" Height="30" Margin="5" Click="TransferCoordinateButton_Click"/>
                         </StackPanel>
                     </Grid>
 
