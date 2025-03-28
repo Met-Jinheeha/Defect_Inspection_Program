@@ -24,8 +24,6 @@ namespace DefectViewProgram
             }
             ParsedContent = File.ReadAllText(filePath);
 
-            List<string[]> defects = new List<string[]>();
-
             string[] lines = ParsedContent.Split('\n'); // 본문 내용을 줄 단위로 배열화 시킴
 
             // "DefectList"가 있는 줄 찾기

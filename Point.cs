@@ -21,5 +21,19 @@ namespace DefectViewProgram
         {
             return $"{this.x},{this.y}";
         }
+
+        //public override bool Equals(object obj)
+        //{
+        //    if (obj == null || GetType() != obj.GetType())
+        //        return false;
+
+        //    Point other = (Point)obj;
+        //    return x == other.x && y == other.y;
+        //}
+
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() ^ y.GetHashCode();
+        }
     }
 }
