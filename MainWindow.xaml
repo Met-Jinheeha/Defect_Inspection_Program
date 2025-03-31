@@ -18,9 +18,17 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1"/>
-
             <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
-                <Image x:Name="defectImage" Stretch="Uniform"/>
+                <Grid>
+                    <TextBlock x:Name="NoImageText" 
+                       Text="이미지가 없습니다." 
+                       FontSize="10" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       Visibility="Hidden"/>
+
+                    <Image x:Name="defectImage" Stretch="Uniform" Visibility="Visible"/>
+                </Grid>
             </Border>
 
 
@@ -84,8 +92,8 @@
                                 <DataGridTextColumn Header="YREL" Binding="{Binding Path=yrel}" Width="100"/>
                                 <DataGridTextColumn Header="XIndex" Binding="{Binding Path=xindex}" Width="50"/>
                                 <DataGridTextColumn Header="YIndex" Binding="{Binding Path=yindex}" Width="50"/>
-                                <DataGridTextColumn Header="xSize" Binding="{Binding Path=xsize}" Width="50"/>
-                                <DataGridTextColumn Header="ySize" Binding="{Binding Path=ysize}" Width="50"/>
+                                <DataGridTextColumn Header="XSize" Binding="{Binding Path=xsize}" Width="50"/>
+                                <DataGridTextColumn Header="YSize" Binding="{Binding Path=ysize}" Width="50"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>

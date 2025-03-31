@@ -25,6 +25,29 @@ namespace DefectViewProgram
         public bool isChipDataView = false;
 
 
+        private string selectedFileName;
+        public string SelectedFileName
+        {
+            get => selectedFileName;
+            set => selectedFileName = value;
+        }
+
+        // 전체 디펙개수
+        int wholeWaferDefectCount = 0;
+
+        // 전체 칩 인덱스
+        int currentWaferIndex = 0;
+
+        // 칩 내부 디펙 현재 인덱스
+        int currentChipDefectIndex = 0;
+
+        // 선택된 Tiff 이미지 인덱스
+        int currentImageIndex = 0;
+
+        private ObservableCollection<object> allDefectsItems = new ObservableCollection<object>();
+        private ObservableCollection<object> chipDefectsItems = new ObservableCollection<object>();
+
+        
 
         private void OpenFolderButton_Click(object sender, RoutedEventArgs e)
         {
@@ -36,7 +59,7 @@ namespace DefectViewProgram
             }
         }
 
-        private void LoadFolders(string path)
+        private void LoadFolders(string path) // 탐색기에서 폴더 선택했을때
         {
             FolderTreeView.Items.Clear();
             currentFolderPath = path;
@@ -53,6 +76,7 @@ namespace DefectViewProgram
             }
         }
 
+        // 탐색기에서 폴더 선택했을때
         private TreeViewItem CreateTreeItem(DirectoryInfo dirInfo)
         {
             var item = new TreeViewItem { Header = dirInfo.Name, Tag = dirInfo.FullName };
@@ -74,6 +98,8 @@ namespace DefectViewProgram
             return item;
         }
 
+
+        // 탐색기에서 폴더 선택했을때, 혹은 내부 트리뷰에서 폴더 선택했을때 
         private void FolderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             var item = FolderTreeView.SelectedItem as TreeViewItem;
@@ -89,6 +115,7 @@ namespace DefectViewProgram
 
             try
             {
+                currentFolderPath = path;
                 foreach (var file in Directory.GetFiles(path))
                 {
                     ListBox.Items.Add(Path.GetFileName(file));
@@ -104,25 +131,11 @@ namespace DefectViewProgram
             var item = FolderTreeView.SelectedItem as TreeViewItem;
             if (item != null)
             {
-                LoadFiles(item.Tag.ToString());
+                LoadFiles(item.Tag.ToString());        
             }
+            ChipInfo chip = new ChipInfo();
+            chip.ChipDefectClear();
         }
-
-
-        /// <summary>
-        /// 폴더 패스를 이용해서 폴더 내부의 파일을 보여주게 하는 함수 호출하는 이벤트 핸들러
-        /// </summary>
-        /// 
-        //private void OpenFolderButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    string selectedFolderPath = GetSelectedFolderPath();
-        //    if (selectedFolderPath != null)
-        //    {
-        //        System.Windows.MessageBox.Show("선택한 폴더: " + selectedFolderPath, "폴더 선택 완료");
-        //        DisplayFileList(selectedFolderPath);
-        //        currentFolderPath = selectedFolderPath;
-        //    }
-        //}
 
         /// <summary>
         /// 폴더 Path 가져오는 함수
@@ -145,47 +158,6 @@ namespace DefectViewProgram
             }
         }
 
-        /// <summary>
-        /// 폴더 내부 파일들의 이름을 보여주는 함수
-        /// 이거 일단 보류
-        /// </summary>
-        /// 
-        //private void DisplayFileList(string folderPath)
-        //{
-        //    string[] files = Directory.GetFiles(folderPath);
-        //    string[] directories = Directory.GetDirectories(folderPath);
-
-        //    ListBox.Items.Clear();
-
-        //    foreach (string directoryPath in directories)
-        //    {
-        //        DirectoryInfo directoryInfo = new DirectoryInfo(directoryPath);
-        //        ListBox.Items.Add(directoryInfo.Name);
-        //    }
-
-        //    foreach (string file in files)
-        //    {
-        //        FileInfo fileInfo = new FileInfo(file);
-        //        string revisedName = fileInfo.Name;
-        //        if (fileInfo.Name.StartsWith("~$"))
-        //        {
-        //            revisedName = fileInfo.Name.Substring(2);
-        //        }
-        //        ListBox.Items.Add(revisedName);
-        //    }
-
-        //    KlarfFileParser parser = new KlarfFileParser();
-        //    parser.ParseText(FullPath); // 스트링
-        //    //TextBlock.Text = parser.ParsedContent;
-        //}
-
-
-        private string selectedFileName;
-        public string SelectedFileName
-        {
-            get => selectedFileName;
-            set => selectedFileName = value;
-        }
 
 
         public void ShowAllList(object sender, RoutedEventArgs e)
@@ -206,14 +178,16 @@ namespace DefectViewProgram
         {
             if (ListBox.SelectedItem != null)
             {
+                ChipInfo chip = new ChipInfo();
+                chip.ChipDefectClear();
+
                 SelectedFileName = ListBox.SelectedItem.ToString();
                 FullPath = Path.Combine(currentFolderPath, SelectedFileName);
 
                 Console.WriteLine(FullPath);
 
                 KlarfFileParser parser = new KlarfFileParser();
-                ChipInfo chip = new ChipInfo();
-
+               
                 parser.ParseText(FullPath);
 
                 string defectInfo = chip.GetAllDefects();
@@ -247,16 +221,14 @@ namespace DefectViewProgram
                 currentWaferIndex = 0;
                 currentChipDefectIndex = 0;
                 txtDefectOnWafer.Text = $"전체 디펙: 1/{allDefectsItems.Count}";
+
                 LoadTiffImage();
 
                 Console.WriteLine(items);
             }
         }
 
-        private ObservableCollection<object> allDefectsItems = new ObservableCollection<object>();
-        private ObservableCollection<object> chipDefectsItems = new ObservableCollection<object>();
 
-        int id = 0;
 
         /// <summary>
         /// 버튼 눌렀을때 디펙 이동해주는 버튼. 전체 웨이퍼일때만 작동함.
@@ -274,15 +246,21 @@ namespace DefectViewProgram
 
             int x = int.Parse(tempArr[0]);
             int y = int.Parse(tempArr[1]);
-
-            
+           
             ChipInfo chip = new ChipInfo();
            
             ObservableCollection<object> items = new ObservableCollection<object>();
 
             List<DefectInfo> defectInfo = chip.GetDefects(x, y);
 
-            id = 0;
+            if(defectInfo.Count == 0)
+            {
+                txtDefectOnChip.Text = $"칩 내 디펙: {0}/{0}";
+                ClearDefectImage();
+                return;
+            }
+
+            currentImageIndex = 0;
 
             chipDefectsItems.Clear();
 
@@ -313,16 +291,13 @@ namespace DefectViewProgram
 
                 // 이제 SelectedItem 접근
                 dynamic selectedItem = defectList.SelectedItem;
-                id = selectedItem != null ? (int)selectedItem.id : -2;
+                currentImageIndex = selectedItem != null ? (int)selectedItem.id - 1 : -2;
             }
             isChipDataView = true;
+            txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
+            LoadDefectImageFromChipOnSelected(currentImageIndex);
         }
 
-        // 전체 칩 인덱스
-        int currentWaferIndex = 0;
-
-        // 칩 내부 디펙 현재 인덱스
-        int currentChipDefectIndex = 0;
 
 
         private void NextDefectOnWholeWaferButton_Click(object sender, RoutedEventArgs e)
@@ -354,11 +329,11 @@ namespace DefectViewProgram
             if (currentWaferIndex > 0)
             {
                 currentWaferIndex--;
-                int count = defectList.Items.Count;
+                wholeWaferDefectCount = defectList.Items.Count;
 
                 defectList.SelectedIndex = currentWaferIndex;
 
-                txtDefectOnWafer.Text = $"전체 디펙: {currentWaferIndex + 1}/{count}";
+                txtDefectOnWafer.Text = $"전체 디펙: {currentWaferIndex + 1}/{wholeWaferDefectCount}";
 
                 LoadDefectImageFromWholeSelected(currentWaferIndex);
             }
@@ -382,12 +357,12 @@ namespace DefectViewProgram
 
                 // 선택된 아이템에서 defectId 가져오기
                 dynamic selectedItem = defectList.SelectedItem;
-                id = selectedItem != null ? (int)selectedItem.id : -2;
+                currentImageIndex = selectedItem != null ? (int)selectedItem.id -1: 0;
 
                 txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
 
                 // 올바른 id로 이미지 로드
-                LoadDefectImageFromChipOnSelected(id);
+                LoadDefectImageFromChipOnSelected(currentImageIndex);
             }
         }
 
@@ -409,12 +384,12 @@ namespace DefectViewProgram
 
                 // 선택된 아이템에서 defectId 가져오기
                 dynamic selectedItem = defectList.SelectedItem;
-                id = selectedItem != null ? (int)selectedItem.id : -2;
+                currentImageIndex = selectedItem != null ? (int)selectedItem.id - 1 : 0;
 
                 txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
 
-                // 올바른 id로 이미지 로드
-                LoadDefectImageFromChipOnSelected(id);
+                LoadDefectImageFromChipOnSelected(currentImageIndex);
+                
             }
         }
 
@@ -460,6 +435,7 @@ namespace DefectViewProgram
                             
                             // 프레임 개수에 따라 UI 업데이트 (페이지 표시 등)
                             UpdateFrameNavigationUI();
+
                         }
                         else
                         {
@@ -481,12 +457,12 @@ namespace DefectViewProgram
                 }
         }
 
-        private void LoadDefectImageFromWholeSelected(int currentWholeWaferIndex)
+        private void LoadDefectImageFromWholeSelected(int currentWholeWaferIndex) // 전체 디펙 이미지 보여주기
         { 
             defectImage.Source = tiffFrames[currentWholeWaferIndex];
         }
 
-        private void LoadDefectImageFromChipOnSelected(int defectId)
+        private void LoadDefectImageFromChipOnSelected(int defectId) // 칩 위의 디펙이미지 보여주기
         {
            
             if (defectId >= 0 && defectId < tiffFrames.Count)
@@ -498,6 +474,15 @@ namespace DefectViewProgram
                 Console.WriteLine($"유효하지 않은 defectId: {defectId}");
             }
         }
+
+
+        private void ClearDefectImage()
+        {
+            defectImage.Source = null;
+            NoImageText.Visibility = Visibility.Visible;
+        }
+
+
 
         // 이미지 탐색 UI 업데이트 메서드
         private void UpdateFrameNavigationUI()

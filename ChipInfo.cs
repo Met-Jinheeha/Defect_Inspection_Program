@@ -86,5 +86,10 @@ namespace DefectViewProgram
             Console.WriteLine(result);
             return result;
         }
+
+        public void ChipDefectClear()
+        {
+            chipDefects.Clear();
+        }
     }
 }
