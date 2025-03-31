@@ -22,7 +22,7 @@ namespace DefectViewProgram
             {
                 return;
             }
-            ParsedContent = File.ReadAllText(filePath);
+            ParsedContent = File.ReadAllText(filePath);  
 
             string[] lines = ParsedContent.Split('\n'); // 본문 내용을 줄 단위로 배열화 시킴
 
