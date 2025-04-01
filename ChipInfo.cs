@@ -75,13 +75,6 @@ namespace DefectViewProgram
             return result;
         }
 
-
-        public string GetAll()
-        {
-            return chipDefects.ToString();
-        }
-
-
         public void ChipDefectClear()
         {
             chipDefects.Clear();

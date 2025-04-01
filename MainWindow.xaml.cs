@@ -17,6 +17,7 @@ namespace DefectViewProgram
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new TiffImageLoaderViewModel();
         }
 
         private string currentFolderPath;
@@ -117,9 +118,7 @@ namespace DefectViewProgram
         private void LoadFiles(string path)
         {
             ListBox.Items.Clear();
-
-            try
-            {
+ 
                 CurrentFolderPath = path;
                 foreach (var file in Directory.GetFiles(path))
                 {
@@ -129,10 +128,6 @@ namespace DefectViewProgram
                     }
                     ListBox.Items.Add(Path.GetFileName(file));
                 }
-            }
-            catch (Exception ex)
-            {
-            }
         }
 
         public bool IsKlarfInfoFileCheck(string filePath)
@@ -199,7 +194,10 @@ namespace DefectViewProgram
             currentWaferIndex = 0;
             currentChipDefectIndex = 0;
             txtDefectOnWafer.Text = $"전체 디펙: 1/{allDefectsItems.Count}";
-            LoadTiffImage();
+
+            //TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
+            var vm = this.DataContext as TiffImageLoaderViewModel;
+            vm.LoadTiffImage(CurrentFolderPath);
             isChipDataView = false;
         }
 
@@ -257,7 +255,8 @@ namespace DefectViewProgram
                 currentChipDefectIndex = 0;
                 txtDefectOnWafer.Text = $"전체 디펙: 1/{allDefectsItems.Count}";
 
-                LoadTiffImage();
+                var vm = this.DataContext as TiffImageLoaderViewModel;
+                vm.LoadTiffImage(CurrentFolderPath);
 
                 Console.WriteLine(items);
             }
@@ -265,7 +264,7 @@ namespace DefectViewProgram
 
 
         /// <summary>
-        /// 버튼 눌렀을때 디펙 이동해주는 버튼. 전체 웨이퍼일때만 작동함.
+        /// 버튼 눌렀을때 특정 칩의 디펙을 보여주는 함수
         /// </summary>
         /// 
         private void TransferCoordinateButton_Click(object sender, RoutedEventArgs e)
@@ -329,7 +328,8 @@ namespace DefectViewProgram
             }
             isChipDataView = true;
             txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
-            LoadDefectImageFromChipOnSelected(currentImageIndex);
+            var vm = this.DataContext as TiffImageLoaderViewModel;
+            vm.LoadDefectImageFromChipOnSelected(currentImageIndex);
         }
 
 
@@ -347,8 +347,8 @@ namespace DefectViewProgram
             defectList.SelectedIndex = currentWaferIndex;
 
             txtDefectOnWafer.Text =  $"전체 디펙: {currentWaferIndex + 1}/{count}";
-
-            LoadDefectImageFromWholeSelected(currentWaferIndex);
+            var vm = this.DataContext as TiffImageLoaderViewModel;
+            vm.LoadDefectImageFromWholeSelected(currentWaferIndex);
         }
 
 
@@ -368,8 +368,8 @@ namespace DefectViewProgram
                 defectList.SelectedIndex = currentWaferIndex;
 
                 txtDefectOnWafer.Text = $"전체 디펙: {currentWaferIndex + 1}/{wholeWaferDefectCount}";
-
-                LoadDefectImageFromWholeSelected(currentWaferIndex);
+                var vm = this.DataContext as TiffImageLoaderViewModel;
+                vm.LoadDefectImageFromWholeSelected(currentWaferIndex);
             }
         }
 
@@ -396,7 +396,8 @@ namespace DefectViewProgram
                 txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
 
                 // 올바른 id로 이미지 로드
-                LoadDefectImageFromChipOnSelected(currentImageIndex);
+                var vm = this.DataContext as TiffImageLoaderViewModel;
+                vm.LoadDefectImageFromChipOnSelected(currentImageIndex);
             }
         }
 
@@ -422,109 +423,15 @@ namespace DefectViewProgram
 
                 txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
 
-                LoadDefectImageFromChipOnSelected(currentImageIndex);
-                
+                var vm = this.DataContext as TiffImageLoaderViewModel;
+                vm.LoadDefectImageFromChipOnSelected(currentImageIndex);
+
             }
         }
-
-        /// <summary>
-        ///  
-        /// </summary>
-
-        private TiffBitmapDecoder currentDecoder;
-        private List<BitmapSource> tiffFrames = new List<BitmapSource>();
-        private int currentFrameIndex = 0;
-
-        private void LoadTiffImage()
-        {
-
-                // ID로 tif 파일 경로 생성
-                string imagePath = Path.Combine(CurrentFolderPath, $"Klarf Format.tif");
-
-                if (File.Exists(imagePath))
-                {
-                    try
-                    {
-                        // 기존 프레임 목록 초기화
-                        tiffFrames.Clear();
-
-                        // TiffBitmapDecoder를 사용하여 멀티페이지 TIFF 로드
-                        currentDecoder = new TiffBitmapDecoder(
-                            new Uri(imagePath, UriKind.Absolute),
-                            BitmapCreateOptions.PreservePixelFormat,
-                            BitmapCacheOption.OnLoad);
-
-                        // 모든 프레임을 리스트에 저장
-                        foreach (BitmapFrame frame in currentDecoder.Frames)
-                        {
-                            tiffFrames.Add(frame);
-                        }
-
-                        currentFrameIndex = 0;
-
-                        if (tiffFrames.Count > 0) // 프레임이 있으면 첫 번째 프레임 표시
-                            {
-                            
-                            defectImage.Source = tiffFrames[currentFrameIndex];
-                            
-                            // 프레임 개수에 따라 UI 업데이트 (페이지 표시 등)
-                            UpdateFrameNavigationUI();
-
-                        }
-                        else
-                        {
-                            defectImage.Source = null;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"이미지 로드 오류: {ex.Message}");
-                        defectImage.Source = null;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"이미지 파일이 존재하지 않음: {imagePath}");
-                    defectImage.Source = null;
-                    tiffFrames.Clear();
-                    UpdateFrameNavigationUI();
-                }
-        }
-
-        private void LoadDefectImageFromWholeSelected(int currentWholeWaferIndex) // 전체 디펙 이미지 보여주기
-        { 
-            defectImage.Source = tiffFrames[currentWholeWaferIndex];
-        }
-
-        private void LoadDefectImageFromChipOnSelected(int defectId) // 칩 위의 디펙이미지 보여주기
-        {
-           
-            if (defectId >= 0 && defectId < tiffFrames.Count)
-            {
-                defectImage.Source = tiffFrames[defectId];
-            }
-            else
-            {
-                Console.WriteLine($"유효하지 않은 defectId: {defectId}");
-            }
-        }
-
         private void ClearDefectImage()
         {
-            defectImage.Source = null;
+            CurrentImage.Source = null;
             NoImageText.Visibility = Visibility.Visible;
         }
-
-
-        // 이미지 탐색 UI 업데이트 메서드
-        private void UpdateFrameNavigationUI()
-        {
-            // 여기서 페이지 수 표시 등의 UI 업데이트
-            // 예: pageInfoTextBlock.Text = $"페이지 {currentFrameIndex + 1}/{tiffFrames.Count}";
-
-            // 페이지 네비게이션 버튼 활성화/비활성화 설정
-            // 예: prevButton.IsEnabled = (currentFrameIndex > 0);
-            // 예: nextButton.IsEnabled = (currentFrameIndex < tiffFrames.Count - 1);
-        } 
     }
 }
