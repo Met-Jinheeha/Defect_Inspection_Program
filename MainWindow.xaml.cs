@@ -20,6 +20,11 @@ namespace DefectViewProgram
         }
 
         private string currentFolderPath;
+        public string CurrentFolderPath
+        {
+            get => currentFolderPath;
+            set => currentFolderPath = value;
+        }
         public string FullPath { get; set; }
 
         public bool isChipDataView = false;
@@ -62,7 +67,7 @@ namespace DefectViewProgram
         private void LoadFolders(string path) // 탐색기에서 폴더 선택했을때
         {
             FolderTreeView.Items.Clear();
-            currentFolderPath = path;
+            CurrentFolderPath = path;
 
             try
             {
@@ -115,9 +120,13 @@ namespace DefectViewProgram
 
             try
             {
-                currentFolderPath = path;
+                CurrentFolderPath = path;
                 foreach (var file in Directory.GetFiles(path))
                 {
+                    if (!IsKlarfInfoFileCheck(file))
+                    {
+                        continue;
+                    }
                     ListBox.Items.Add(Path.GetFileName(file));
                 }
             }
@@ -125,6 +134,31 @@ namespace DefectViewProgram
             {
             }
         }
+
+        public bool IsKlarfInfoFileCheck(string filePath)
+        {
+            try
+            {
+                using (StreamReader reader = new StreamReader(filePath))
+                {
+                    // 처음 20줄만 확인
+                    for (int i = 0; i < 20 && !reader.EndOfStream; i++)
+                    {
+                        string line = reader.ReadLine();
+                        if (line.Contains("FileVersion") || line.Contains("WaferID") || line.Contains("LotID"))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            catch
+            {
+                return false; // 파일 읽기 실패시
+            }
+        }
+
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
@@ -159,7 +193,6 @@ namespace DefectViewProgram
         }
 
 
-
         public void ShowAllList(object sender, RoutedEventArgs e)
         {
             defectList.ItemsSource = allDefectsItems;
@@ -182,7 +215,7 @@ namespace DefectViewProgram
                 chip.ChipDefectClear();
 
                 SelectedFileName = ListBox.SelectedItem.ToString();
-                FullPath = Path.Combine(currentFolderPath, SelectedFileName);
+                FullPath = Path.Combine(CurrentFolderPath, SelectedFileName);
 
                 Console.WriteLine(FullPath);
 
@@ -217,6 +250,8 @@ namespace DefectViewProgram
                     });
                 }
 
+                waferInfomationText.Text = parser.waferInfo;
+
                 defectList.ItemsSource = allDefectsItems;
                 currentWaferIndex = 0;
                 currentChipDefectIndex = 0;
@@ -227,7 +262,6 @@ namespace DefectViewProgram
                 Console.WriteLine(items);
             }
         }
-
 
 
         /// <summary>
@@ -268,13 +302,13 @@ namespace DefectViewProgram
             {
                 chipDefectsItems.Add(new
                 {
-                    id = defectInfo[i].defectId,
-                    xrel = defectInfo[i].xRel,
-                    yrel = defectInfo[i].yRel,
-                    xindex = defectInfo[i].xIndex,
-                    yindex = defectInfo[i].yIndex,
-                    xsize = defectInfo[i].xSize,
-                    ysize = defectInfo[i].ySize
+                    id = defectInfo[i].DefectId,
+                    xrel = defectInfo[i].XRel,
+                    yrel = defectInfo[i].YRel,
+                    xindex = defectInfo[i].XIndex,
+                    yindex = defectInfo[i].YIndex,
+                    xsize = defectInfo[i].XSize,
+                    ysize = defectInfo[i].YSize
                 });
             }
 
@@ -405,7 +439,7 @@ namespace DefectViewProgram
         {
 
                 // ID로 tif 파일 경로 생성
-                string imagePath = Path.Combine(currentFolderPath, $"Klarf Format.tif");
+                string imagePath = Path.Combine(CurrentFolderPath, $"Klarf Format.tif");
 
                 if (File.Exists(imagePath))
                 {
@@ -475,13 +509,11 @@ namespace DefectViewProgram
             }
         }
 
-
         private void ClearDefectImage()
         {
             defectImage.Source = null;
             NoImageText.Visibility = Visibility.Visible;
         }
-
 
 
         // 이미지 탐색 UI 업데이트 메서드

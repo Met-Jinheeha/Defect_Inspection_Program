@@ -23,7 +23,12 @@ namespace DefectViewProgram
 
         }
 
-        private static Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
+        public static Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
+        public Dictionary<Point, List<DefectInfo>> ChipDefect
+        {
+            get => chipDefects;
+            set => chipDefects = value;
+        }
 
 
         public override string ToString()
@@ -40,15 +45,19 @@ namespace DefectViewProgram
             chipDefects[ChipIndex].Add(defectData);
         }
 
-        //public List<DefectInfo> GetDefects(int xIndex, int yIndex)
-        //{
-        //    Point chipPoint = new Point(xIndex, yIndex);
+        public string GetAllDefects()
+        {
+            StringBuilder sb = new StringBuilder();
 
-        //    if (chipDefects.ContainsKey(chipPoint))
-        //        return chipDefects[chipPoint];
+            foreach (var kvp in chipDefects)
+            {
+                sb.AppendLine($"{kvp.Key},{string.Join(",", kvp.Value)}");
+            }
 
-        //    return new List<DefectInfo>();
-        //}
+            string result = sb.ToString();
+            Console.WriteLine(result);
+            return result;
+        }
 
 
         public List<DefectInfo> GetDefects(int xIndex, int yIndex)
@@ -72,20 +81,6 @@ namespace DefectViewProgram
             return chipDefects.ToString();
         }
 
-
-        public string GetAllDefects()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var kvp in chipDefects)
-            {
-                sb.AppendLine($"{kvp.Key},{string.Join(",", kvp.Value)}");
-            }
-
-            string result = sb.ToString();
-            Console.WriteLine(result);
-            return result;
-        }
 
         public void ChipDefectClear()
         {
