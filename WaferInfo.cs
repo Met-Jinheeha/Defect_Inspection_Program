@@ -143,7 +143,6 @@ namespace DefectViewProgram
             return str.Substring(0, str.Length - 1);
         }
 
-
         public override string ToString()
         {
             Content = $"Time: {DateTime}\n" +

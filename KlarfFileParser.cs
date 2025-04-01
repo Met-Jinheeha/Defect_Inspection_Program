@@ -17,8 +17,6 @@ namespace DefectViewProgram
 
         public string waferInfo = "";
 
-        //public static List<string> list = new List<string>();
-
 
         public void ParseText(string filePath)
         {
@@ -60,11 +58,7 @@ namespace DefectViewProgram
             {
                 for (int i = defectListLine + 1; i < lines.Length - 4; i = i + 2)
                 {
-                    //Console.WriteLine(lines[i]);
                     defectInfo = lines[i].Split(' '); // 디펙하나 483개 중에 한줄
-                    //defects.Add(defectInfo);
-
-                    //list.Add(lines[i]);
 
                     DefectInfo defectDetails = new DefectInfo(defectInfo); // Defect 정보를 반복적으로 초기화
                     defectDetails.WriteDefectInfo(defectDetails);

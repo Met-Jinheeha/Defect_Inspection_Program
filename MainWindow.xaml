@@ -27,7 +27,7 @@
                        VerticalAlignment="Center"
                        Visibility="Hidden"/>
 
-                    <Image x:Name="defectImage" Stretch="Uniform" Visibility="Visible"/>
+                    <Image x:Name="CurrentImage" Stretch="Uniform" Visibility="Visible" Source="{Binding CurrentImage}"/>
                 </Grid>
             </Border>
 
