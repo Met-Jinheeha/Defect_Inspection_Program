@@ -104,6 +104,18 @@ namespace DefectViewProgram
             set => waferId = value;
         }
 
+        private string slotId;
+        public string SlotId
+        {
+            get
+            {
+                string[] tempArr = slotId.Split(' ');
+                slotId = RemoveLastChar(tempArr[1]);
+                return slotId;
+            }
+            set => slotId = value;
+        }
+
         private string Content
         {
             get; set;
@@ -120,6 +132,7 @@ namespace DefectViewProgram
             SampleOrientationMarkType = waferInfoContent[5];
             OrientationMarkLocation = waferInfoContent[6];
             WaferId = waferInfoContent[7];
+            SlotId = waferInfoContent[8];
         }
 
         public static string RemoveLastChar(string str)
@@ -140,7 +153,8 @@ namespace DefectViewProgram
                           $"StepId: {StepId}\n" +
                           $"WaferMarkType: {SampleOrientationMarkType}\n" +
                           $"MarkPosition: {OrientationMarkLocation}\n" +
-                          $"WaferId: {WaferId}";
+                          $"WaferId: {WaferId}\n" +
+                          $"SlotId: {SlotId}";
             return Content;
         }
     }

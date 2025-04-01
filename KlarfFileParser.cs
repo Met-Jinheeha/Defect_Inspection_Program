@@ -13,7 +13,7 @@ namespace DefectViewProgram
 
         string[] defectInfo = new string[20];
 
-        string[] sampleInfo = new string[8];
+        string[] sampleInfo = new string[9];
 
         public string waferInfo = "";
 
@@ -43,7 +43,7 @@ namespace DefectViewProgram
                 sampleInfo[5] = lines[10];// 노치타입여부
                 sampleInfo[6] = lines[11];// 노치위치
                 sampleInfo[7] = lines[15];// 웨이퍼아이디
-
+                sampleInfo[8] = lines[16];// Slot 넘버
 
                 if (lines[i].Contains("DefectList"))
                 {
