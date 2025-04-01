@@ -58,31 +58,50 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 상단 영역: 디펙 제어 UI -->
-                    <StackPanel Grid.Row="0" Orientation="Vertical">
-                        <!-- 전체 디펙 이동 UI -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
-                            <Button Content="◀" Width="40" Height="30" Margin="5" Click="PreviousDefectOnWholeWaferButton_Click"/>
-                            <TextBlock x:Name="txtDefectOnWafer" Text="전체 디펙: 0/0" VerticalAlignment="Center" Margin="10,0"/>
-                            <Button Content="▶" Width="40" Height="30" Margin="5" Click="NextDefectOnWholeWaferButton_Click"/>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        
+                        <!-- 상단 영역: 디펙 제어 UI -->
+                        <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Margin="35,0,34.6,0">
+                            <TextBlock Text="Defect Information" FontSize="19"/>
+                            <ScrollViewer Height="162" VerticalScrollBarVisibility="Auto">
+                                <TextBlock x:Name="waferInfomationText" FontSize="13" TextWrapping="Wrap"/>
+                            </ScrollViewer>
                         </StackPanel>
 
-                        <!-- 칩 내부 디펙 이동 UI -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
-                            <Button Content="◀" Width="40" Height="30" Margin="5" Click="PreviousDefectOnChipButton_Click"/>
-                            <TextBlock x:Name="txtDefectOnChip" Text="칩 내 디펙: 0/0" VerticalAlignment="Center" Margin="10,0"/>
-                            <Button Content="▶" Width="40" Height="30" Margin="5" Click="NextDefectOnChipButton_Click"/>
-                        </StackPanel>
+                        <!-- 상단 영역: 디펙 제어 UI -->
+                        <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0.2,0" Width="395">
+                            <!-- 전체 디펙 이동 UI -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+                                <Button Content="◀" Width="40" Height="30" Margin="5" Click="PreviousDefectOnWholeWaferButton_Click"/>
+                                <TextBlock x:Name="txtDefectOnWafer" Text="전체 디펙: 0/0" VerticalAlignment="Center" Margin="10,0"/>
+                                <Button Content="▶" Width="40" Height="30" Margin="5" Click="NextDefectOnWholeWaferButton_Click"/>
+                            </StackPanel>
 
-                        <!-- 칩 디펙 조회 입력 -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
-                            <TextBlock Text="칩 좌표:" VerticalAlignment="Center" Margin="5,0"/>
-                            <TextBox x:Name="transferCoordinate1" Width="80" VerticalAlignment="Center" Margin="5,0"/>
-                            <Button Content="칩 Defect 조회" Width="100" Height="30" Margin="5" Click="TransferCoordinateButton_Click"/>
-                            <Button Content="전체 Defect 조회" Width="100" Height="30" Margin="5" Click="ShowAllList"/>
-                        </StackPanel>
-                    </StackPanel>
+                            <!-- 칩 내부 디펙 이동 UI -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+                                <Button Content="◀" Width="40" Height="30" Margin="5" Click="PreviousDefectOnChipButton_Click"/>
+                                <TextBlock x:Name="txtDefectOnChip" Text="칩 내 디펙: 0/0" VerticalAlignment="Center" Margin="10,0"/>
+                                <Button Content="▶" Width="40" Height="30" Margin="5" Click="NextDefectOnChipButton_Click"/>
+                            </StackPanel>
 
+                            <!-- 칩 디펙 조회 입력 -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+                                <TextBlock Text="칩 좌표:" VerticalAlignment="Center" Margin="5,0"/>
+                                <TextBox x:Name="transferCoordinate1" Width="80" VerticalAlignment="Center" Margin="5,0"/>
+                                <Button Content="칩 Defect 조회" Width="100" Height="30" Margin="5" Click="TransferCoordinateButton_Click"/>
+                                <Button Content="전체 Defect 조회" Width="100" Height="30" Margin="5" Click="ShowAllList"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                                       
+                    
+                    
+                    
                     <!-- 하단 영역: 데이터그리드 -->
                     <DockPanel Grid.Row="1" LastChildFill="True">
                         <DataGrid x:Name="defectList" AutoGenerateColumns="False">
