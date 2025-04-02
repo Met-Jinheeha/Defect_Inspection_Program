@@ -135,7 +135,7 @@ namespace DefectViewProgram
             SlotId = waferInfoContent[8];
         }
 
-        public static string RemoveLastChar(string str)
+        public string RemoveLastChar(string str)
         {
             if (string.IsNullOrEmpty(str))
                 return str;

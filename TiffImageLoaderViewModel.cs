@@ -12,11 +12,11 @@ namespace DefectViewProgram
     public class TiffImageLoaderViewModel : BaseViewModel
     {
 
-        private BitmapSource _currentImage;
+        private BitmapSource currentImage;
         public BitmapSource CurrentImage
         {
-            get { return _currentImage; }
-            set { SetProperty(ref _currentImage, value); }
+            get { return currentImage; }
+            set { SetProperty(ref currentImage, value); } // 이미지 바뀔때 SetProperty 호출 
         }
 
         /// <summary>

@@ -11,9 +11,9 @@ namespace DefectViewProgram
     {
         public string ParsedContent { get; private set; }
 
-        string[] defectInfo = new string[20];
+        public string[] defectInfo = new string[20];
 
-        string[] sampleInfo = new string[9];
+        public string[] sampleInfo = new string[9];
 
         public string waferInfo = "";
 
@@ -29,7 +29,7 @@ namespace DefectViewProgram
             string[] lines = ParsedContent.Split('\n'); // 본문 내용을 줄 단위로 배열화 시킴
 
 
-            // "DefectList"가 있는 줄 찾기
+            // Wafer정보 입력
             int defectListLine = -1;
             for (int i = 0; i < lines.Length; i++)
             {
@@ -43,6 +43,7 @@ namespace DefectViewProgram
                 sampleInfo[7] = lines[15];// 웨이퍼아이디
                 sampleInfo[8] = lines[16];// Slot 넘버
 
+                // "DefectList"가 있는 줄 찾기
                 if (lines[i].Contains("DefectList"))
                 {
                     defectListLine = i;

@@ -24,27 +24,30 @@ namespace DefectViewProgram
         }
 
         public static Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
-        public Dictionary<Point, List<DefectInfo>> ChipDefect
-        {
-            get => chipDefects;
-            set => chipDefects = value;
-        }
+        //public Dictionary<Point, List<DefectInfo>> ChipDefect
+        //{
+        //    get => chipDefects;
+        //    set => chipDefects = value;
+        //}
 
 
-        public override string ToString()
-        {
-            return $"{ChipIndex.x},{ChipIndex.y},{chipDefects.Values}";
-        }
+        //public override string ToString()
+        //{
+        //    return $"{ChipIndex.x},{ChipIndex.y},{chipDefects.Values}";
+        //}
 
         public void AddDefect(DefectInfo defectData)
         {
             if (!chipDefects.ContainsKey(ChipIndex))
             {
-                chipDefects[ChipIndex] = new List<DefectInfo>();
+                chipDefects[ChipIndex] = new List<DefectInfo>(); // 없을 경우 디펙인포 리스트 밸류값 객체
             }
-            chipDefects[ChipIndex].Add(defectData);
+            chipDefects[ChipIndex].Add(defectData); // 키값에 이미 값이 있을 경우 리스트에 객체 추가
         }
 
+        /// <summary>
+        /// StringBuilder 
+        /// </summary>
         public string GetAllDefects()
         {
             StringBuilder sb = new StringBuilder();
@@ -67,7 +70,7 @@ namespace DefectViewProgram
             foreach (var entry in chipDefects)
             {
                 Point key = entry.Key;
-                if ((int)key.x == xIndex && (int)key.y == yIndex)
+                if (key.x == xIndex && key.y == yIndex)
                 {
                     result.AddRange(entry.Value);
                 }
