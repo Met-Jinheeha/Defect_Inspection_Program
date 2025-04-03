@@ -10,19 +10,12 @@ namespace DefectViewProgram
     class DefectInfo
     {
         public int DefectId { get; set; }
-
         public double XRel { get; set; }
-
         public double YRel { get; set; }
-
         public int XIndex { get; set; }
-
         public int YIndex { get; set; }
-
         public int XSize { get; set; }
-
         public int YSize { get; set; }
-
 
         public DefectInfo(string[] content)
         {
