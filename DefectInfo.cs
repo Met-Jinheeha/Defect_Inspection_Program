@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace DefectViewProgram
 {
-    class DefectInfo
+    public class DefectInfo
     {
         public int DefectId { get; set; }
         public double XRel { get; set; }
@@ -29,7 +29,7 @@ namespace DefectViewProgram
             YSize = int.Parse(content[6]);
         }
         public DefectInfo()
-        { 
+        {
         }
 
         public override string ToString()

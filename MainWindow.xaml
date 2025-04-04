@@ -40,11 +40,11 @@
                     </Grid.ColumnDefinitions>
                     <!-- 첫 번째 컬럼: 폴더 트리 -->
                     <DockPanel Grid.Column="0">
-                        <Button DockPanel.Dock="Bottom" Content="폴더선택"  Command="{Binding OpenFolderCommand}" Height="30" Margin="5"/>
+                        <Button DockPanel.Dock="Bottom" Content="폴더선택"  Command="{Binding fileOpenViewModel.OpenFolderCommand}" Height="30" Margin="5"/>
                         <TreeView x:Name="FolderTreeView" Margin="5">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectedItemChanged">
-                                    <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}" 
+                                    <i:InvokeCommandAction Command="{Binding fileOpenViewModel.SelectionChangedCommand}" 
                                  CommandParameter="{Binding ElementName=FolderTreeView, Path=SelectedItem}"/>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
@@ -54,8 +54,13 @@
                     <!-- 두 번째 컬럼: 파일 목록 -->
                     <DockPanel Grid.Column="1">
                         <!--<Button DockPanel.Dock="Bottom" Content="새로고침" Click="RefreshButton_Click" Command="{Binding RefreshFileList}" Height="30" Margin="5"/>-->
-                        <ListBox x:Name="FileListBox" Margin="5" ItemsSource="{Binding FileListBox}"/>
-                        <!--SelectionChanged="ListBox_SelectionChanged"-->
+                        <ListBox x:Name="FileListBox" Margin="5">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding fileOpenViewModel.FileListSelectionChangedCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ListBox>
                     </DockPanel>
                 </Grid>
             </Border>
@@ -77,7 +82,7 @@
                         <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Margin="35,0,34.6,0">
                             <TextBlock Text="Wafer Information" FontSize="19"/>
                             <ScrollViewer Height="162" VerticalScrollBarVisibility="Auto">
-                                <TextBlock x:Name="WaferInfomationText" FontSize="13" TextWrapping="Wrap" Text="{Binding WaferInformation}"/>
+                                <TextBlock x:Name="WaferInfomationText" FontSize="13" TextWrapping="Wrap" Text="{Binding fileOpenViewModel.WaferInformation}"/>
                             </ScrollViewer>
                         </StackPanel>
 
@@ -109,11 +114,11 @@
                                                   
                     <!-- 하단 영역: 데이터그리드 -->
                     <DockPanel Grid.Row="1" LastChildFill="True">
-                        <DataGrid x:Name="DefectList" AutoGenerateColumns="False" ItemsSource="{Binding DefectList}">
+                        <DataGrid x:Name="DefectList" AutoGenerateColumns="False" ItemsSource="{Binding fileOpenViewModel.DefectList}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding Path=DefectId}" Width="50"/>
-                                <DataGridTextColumn Header="XREL" Binding="{Binding Path=XRel}" Width="100"/>
-                                <DataGridTextColumn Header="YREL" Binding="{Binding Path=YRel}" Width="100"/>
+                                <DataGridTextColumn Header="DefectId" Binding="{Binding Path=DefectId}" Width="50"/>
+                                <DataGridTextColumn Header="XRel" Binding="{Binding Path=XRel}" Width="100"/>
+                                <DataGridTextColumn Header="YRel" Binding="{Binding Path=YRel}" Width="100"/>
                                 <DataGridTextColumn Header="XIndex" Binding="{Binding Path=XIndex}" Width="50"/>
                                 <DataGridTextColumn Header="YIndex" Binding="{Binding Path=YIndex}" Width="50"/>
                                 <DataGridTextColumn Header="XSize" Binding="{Binding Path=XSize}" Width="50"/>

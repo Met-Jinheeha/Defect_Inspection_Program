@@ -12,7 +12,7 @@ using System.Windows.Input;
 
 namespace DefectViewProgram
 {
-    class FileOpenViewModel : BaseViewModel
+    public class FileOpenViewModel : BaseViewModel
     {
 
         private string currentFolderPath;
@@ -68,7 +68,7 @@ namespace DefectViewProgram
 
 
         // ViewModel
-        private ObservableCollection<DefectInfo> defectList;
+        private ObservableCollection<DefectInfo> defectList =  new ObservableCollection<DefectInfo>();
         public ObservableCollection<DefectInfo> DefectList
         {
             get => defectList;
@@ -231,7 +231,7 @@ namespace DefectViewProgram
         /// <summary>
         /// 파일 새로고침
         /// </summary>
-        public void RefreshButton_Click(object sender, RoutedEventArgs e)
+        public void RefreshFiles()
         {
             var item = FolderTreeView.SelectedItem as TreeViewItem;
             if (item != null)
@@ -241,6 +241,20 @@ namespace DefectViewProgram
             ChipInfo chip = new ChipInfo();
             chip.ChipDefectClear();
         }
+
+        private ICommand refreshFilesCommand;
+        public ICommand RefreshFilesCommand
+        {
+            get
+            {
+                if (refreshFilesCommand == null)
+                {
+                    refreshFilesCommand = new RelayCommand(RefreshFiles);
+                }
+                return refreshFilesCommand;
+            }
+        }
+
 
         /// <summary>
         /// 폴더 Path 가져오는 함수
@@ -284,11 +298,25 @@ namespace DefectViewProgram
             set => SetProperty(ref textDefectOnWafer, value);
         }
 
+
+        private ICommand fileListSelectionChangedCommand;
+        public ICommand FileListSelectionChangedCommand
+        {
+            get
+            {
+                if (fileListSelectionChangedCommand == null)
+                {
+                    fileListSelectionChangedCommand = new RelayCommand(FileListSelectionChanged);
+                }
+                return fileListSelectionChangedCommand;
+            }
+        }
+
         /// <summary>
         /// 리스트 박스에 있는것(Klarf.txt) 클릭했을 때 파싱해주는 함수
         /// </summary>
         /// 
-        public void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void FileListSelectionChanged()
         {
             if (FileListBox.SelectedItem != null)
             {
@@ -309,7 +337,7 @@ namespace DefectViewProgram
                 //ObservableCollection<object> items = new ObservableCollection<object>();
 
                 string[] lines = defectInfo.Split('\n');
-
+                
                 allDefectsItems.Clear();
 
                 foreach (string line in lines)
@@ -317,8 +345,18 @@ namespace DefectViewProgram
                     string[] parts = line.Split(',');
                     if (parts.Length < 7) continue;
 
-                    DefectList.Add(new DefectInfo(parts));
+                    DefectList.Add(new DefectInfo
+                    {
+                        DefectId = int.Parse(parts[2]),
+                        XRel = double.Parse(parts[3]),
+                        YRel = double.Parse(parts[4]),
+                        XIndex = int.Parse(parts[5]),
+                        YIndex = int.Parse(parts[6]),
+                        XSize = int.Parse(parts[7]),
+                        YSize = int.Parse(parts[8])
+                    });
                 }
+            
 
                 WaferInformation = parser.waferInfo;
 
