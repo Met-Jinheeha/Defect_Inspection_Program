@@ -169,11 +169,19 @@ namespace DefectViewProgram
         }
 
 
-        // 탐색기에서 폴더 선택했을때, 혹은 내부 트리뷰에서 폴더 선택했을때 
-        public void FolderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        // Command 속성
+        public ICommand SelectionChangedCommand { get; private set; }
+
+        // 생성자에서 Command 초기화
+        public FileOpenViewModel()
         {
-            var item = FolderTreeView.SelectedItem as TreeViewItem;
-            if (item != null)
+            SelectionChangedCommand = new RelayCommand<object>(HandleSelectionChanged);
+        }
+
+        // Command 실행 메소드
+        private void HandleSelectionChanged(object parameter)
+        {
+            if (parameter is TreeViewItem item)
             {
                 LoadFiles(item.Tag.ToString());
             }

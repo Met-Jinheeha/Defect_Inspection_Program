@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DefectViewProgram"
+        xmlns:local="clr-namespace:DefectViewProgram" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -41,7 +41,14 @@
                     <!-- 첫 번째 컬럼: 폴더 트리 -->
                     <DockPanel Grid.Column="0">
                         <Button DockPanel.Dock="Bottom" Content="폴더선택"  Command="{Binding OpenFolderCommand}" Height="30" Margin="5"/>
-                        <TreeView x:Name="FolderTreeView" Margin="5" SelectedItemChanged="FolderTreeView_SelectedItemChanged"/>
+                        <TreeView x:Name="FolderTreeView" Margin="5">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectedItemChanged">
+                                    <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}" 
+                                 CommandParameter="{Binding ElementName=FolderTreeView, Path=SelectedItem}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TreeView>
                     </DockPanel>
 
                     <!-- 두 번째 컬럼: 파일 목록 -->

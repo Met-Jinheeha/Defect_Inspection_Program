@@ -33,13 +33,13 @@ namespace DefectViewProgram
             }
         }
 
-        // 트리뷰 선택 변경 이벤트 핸들러
-        private void FolderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (fileOpenViewModel != null)
-            {
-                fileOpenViewModel.FolderTreeView_SelectedItemChanged(sender, e);
-            }
-        }
+        //// 트리뷰 선택 변경 이벤트 핸들러
+        //private void FolderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        //{
+        //    if (fileOpenViewModel != null)
+        //    {
+        //        fileOpenViewModel.FolderTreeView_SelectedItemChanged(sender, e);
+        //    }
+        //}
     }
 }
