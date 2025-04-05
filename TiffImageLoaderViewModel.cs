@@ -52,7 +52,7 @@ namespace DefectViewProgram
                         tiffFrames.Add(frame);
                     }
 
-                    currentFrameIndex = 1;
+                    currentFrameIndex = 0;
 
                     if (tiffFrames.Count > 0) // 프레임이 있으면 첫 번째 프레임 표시
                     {

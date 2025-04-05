@@ -7,16 +7,19 @@ using System.Threading.Tasks;
 namespace DefectViewProgram
 {
     // 두 개의 뷰모델을 포함하는 MainViewModel 생성
-    public class MainViewModel
+    public class MainViewModel : BaseViewModel
     {
-        public TiffImageLoaderViewModel TiffLoader { get; set; }
+        public TiffImageLoaderViewModel tiffLoaderViewModel { get; set; }
         public FileOpenViewModel fileOpenViewModel { get; set; }
 
         public MainViewModel()
         {
-            TiffLoader = new TiffImageLoaderViewModel();
+            tiffLoaderViewModel = new TiffImageLoaderViewModel();
             fileOpenViewModel = new FileOpenViewModel();
+
+            fileOpenViewModel.FileSelected += folderPath => {
+                tiffLoaderViewModel.LoadTiffImage(folderPath);
+            };
         }
     }
 }
-

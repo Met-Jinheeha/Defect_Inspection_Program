@@ -312,6 +312,10 @@ namespace DefectViewProgram
             }
         }
 
+        public MainViewModel MainViewModel { get; set; }
+
+        public event Action<string> FileSelected;
+
         /// <summary>
         /// 리스트 박스에 있는것(Klarf.txt) 클릭했을 때 파싱해주는 함수
         /// </summary>
@@ -360,15 +364,17 @@ namespace DefectViewProgram
 
                 WaferInformation = parser.waferInfo;
 
+                FileSelected?.Invoke(CurrentFolderPath);
+
                 //DefectItems.ItemsSource = allDefectsItems;
                 currentWaferIndex = 0;
                 currentChipDefectIndex = 0;
                 TextDefectOnWafer = $"전체 디펙: 1/{allDefectsItems.Count}";
 
-                //var vm = this.DataContext as TiffImageLoaderViewModel;
-                //vm.LoadTiffImage(CurrentFolderPath);
-                TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
-                loader.LoadTiffImage(CurrentFolderPath);
+                if (MainViewModel != null && MainViewModel.tiffLoaderViewModel != null)
+                {
+                    MainViewModel.tiffLoaderViewModel.LoadTiffImage(CurrentFolderPath);
+                }
 
                 //Console.WriteLine(items);
             }

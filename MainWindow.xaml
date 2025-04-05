@@ -26,8 +26,7 @@
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center"
                        Visibility="Hidden"/>
-
-                    <!--<Image x:Name="CurrentImage" Stretch="Uniform" Visibility="Visible" Source="{Binding CurrentImage}"/>-->
+                    <Image x:Name="CurrentImage" Stretch="Uniform" Visibility="Visible" Source="{Binding tiffLoaderViewModel.CurrentImage}"/>
                 </Grid>
             </Border>
 
@@ -53,7 +52,7 @@
 
                     <!-- 두 번째 컬럼: 파일 목록 -->
                     <DockPanel Grid.Column="1">
-                        <!--<Button DockPanel.Dock="Bottom" Content="새로고침" Click="RefreshButton_Click" Command="{Binding RefreshFileList}" Height="30" Margin="5"/>-->
+                        <Button DockPanel.Dock="Bottom" Content="새로고침" Command="{Binding fileOpenViewModel.RefreshFilesCommand}" Height="30" Margin="5"/>
                         <ListBox x:Name="FileListBox" Margin="5">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
