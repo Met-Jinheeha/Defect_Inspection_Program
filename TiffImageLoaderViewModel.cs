@@ -80,8 +80,10 @@ namespace DefectViewProgram
             Console.WriteLine($"CurrentImage 설정됨: {CurrentImage != null}");
         }
 
+
         public void LoadDefectImageFromWholeSelected(int currentWholeWaferIndex) // 전체 디펙 이미지 보여주기
         {
+
             CurrentImage = tiffFrames[currentWholeWaferIndex];
         }
 

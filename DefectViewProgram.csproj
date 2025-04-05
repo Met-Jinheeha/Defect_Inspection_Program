@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="BaseViewModel.cs" />
     <Compile Include="ChipInfo.cs" />
+    <Compile Include="DefectControlViewModel.cs" />
     <Compile Include="FileOpenViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="RelayCommadGenerics.cs" />

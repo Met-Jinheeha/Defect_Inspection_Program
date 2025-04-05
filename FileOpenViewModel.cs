@@ -23,10 +23,6 @@ namespace DefectViewProgram
         }
         public string Name { get; set; }
         public string FullPath { get; set; }
-        public ObservableCollection<FileOpenViewModel> Children { get; set; } = new ObservableCollection<FileOpenViewModel>();
-
-
-        public bool isChipDataView = false;
 
 
         private string selectedFileName;
@@ -67,13 +63,28 @@ namespace DefectViewProgram
         }
 
 
-        // ViewModel
+        // FileOpenViewModel
         private ObservableCollection<DefectInfo> defectList =  new ObservableCollection<DefectInfo>();
         public ObservableCollection<DefectInfo> DefectList
         {
             get => defectList;
             set => SetProperty(ref defectList, value);
         }
+
+        private int selectedDefectIndex;
+        public int SelectedDefectIndex
+        {
+            get => selectedDefectIndex;
+            set => SetProperty(ref selectedDefectIndex, value);
+        }
+
+        private bool isSelectedKlarfFile;
+        public bool IsSelectedKlarfFile
+        {
+            get => isSelectedKlarfFile;
+            set => SetProperty(ref isSelectedKlarfFile, value);
+        }
+
 
         // 전체 디펙개수
         public int wholeWaferDefectCount = 0;
@@ -342,7 +353,7 @@ namespace DefectViewProgram
 
                 string[] lines = defectInfo.Split('\n');
                 
-                allDefectsItems.Clear();
+                DefectList.Clear();
 
                 foreach (string line in lines)
                 {
@@ -361,7 +372,6 @@ namespace DefectViewProgram
                     });
                 }
             
-
                 WaferInformation = parser.waferInfo;
 
                 FileSelected?.Invoke(CurrentFolderPath);
@@ -369,202 +379,20 @@ namespace DefectViewProgram
                 //DefectItems.ItemsSource = allDefectsItems;
                 currentWaferIndex = 0;
                 currentChipDefectIndex = 0;
-                TextDefectOnWafer = $"전체 디펙: 1/{allDefectsItems.Count}";
+                IsSelectedKlarfFile = true;
+                SelectedDefectIndex = 0;
+                TextDefectOnWafer = $"전체 디펙: 1/{DefectList.Count}";
 
                 if (MainViewModel != null && MainViewModel.tiffLoaderViewModel != null)
                 {
                     MainViewModel.tiffLoaderViewModel.LoadTiffImage(CurrentFolderPath);
                 }
-
-                //Console.WriteLine(items);
             }
         }
 
 
 
-        /// <summary>
-        /// 버튼 눌렀을때 특정 칩의 디펙을 보여주는 함수
-        /// </summary>
-        /// 
-        //public void TransferCoordinateButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    string temp = transferCoordinate1.Text;
-
-        //    // 웨이퍼 그래픽에서 입력 됐을때 들어오는 속성추가해야됨 04.02
-
-        //    string[] tempArr = temp.Split(',');
-
-        //    for (int i = 0; i < tempArr.Length; i++)
-        //    {
-        //        tempArr[i] = tempArr[i].Trim();
-        //    }
-
-        //    int x = int.Parse(tempArr[0]);
-        //    int y = int.Parse(tempArr[1]);
-
-        //    ChipInfo chip = new ChipInfo();
-
-        //    //ObservableCollection<object> items = new ObservableCollection<object>();
-
-        //    List<DefectInfo> defectInfo = chip.GetDefects(x, y);
-
-        //    if (defectInfo.Count == 0)
-        //    {
-        //        txtDefectOnChip.Text = $"칩 내 디펙: {0}/{0}";
-        //        ClearDefectImage();
-        //        return;
-        //    }
-
-        //    currentImageIndex = 0;
-
-        //    chipDefectsItems.Clear();
-
-        //    for (int i = 0; i < defectInfo.Count; i++)
-        //    {
-        //        chipDefectsItems.Add(new
-        //        {
-        //            id = defectInfo[i].DefectId,
-        //            xrel = defectInfo[i].XRel,
-        //            yrel = defectInfo[i].YRel,
-        //            xindex = defectInfo[i].XIndex,
-        //            yindex = defectInfo[i].YIndex,
-        //            xsize = defectInfo[i].XSize,
-        //            ysize = defectInfo[i].YSize
-        //        });
-        //    }
-
-        //    // 칩 모드로 전환
-        //    // 먼저 ItemsSource 설정
-        //    defectList.ItemsSource = chipDefectsItems;
-
-        //    // 아이템이 있는지 확인
-        //    if (chipDefectsItems.Count > 0)
-        //    {
-        //        // 첫 아이템 선택
-        //        defectList.SelectedIndex = 0;
-        //        currentChipDefectIndex = 0;
-
-        //        // 이제 SelectedItem 접근
-        //        dynamic selectedItem = defectList.SelectedItem;
-        //        currentImageIndex = selectedItem != null ? (int)selectedItem.id - 1 : -2;
-        //    }
-        //    isChipDataView = true;
-        //    txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
-        //    //var vm = this.DataContext as TiffImageLoaderViewModel;
-        //    //vm.LoadDefectImageFromChipOnSelected(currentImageIndex);
-        //    TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
-        //    loader.LoadTiffImage(CurrentFolderPath);
-        //}
-
-
-
-        //public void NextDefectOnWholeWaferButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (isChipDataView)
-        //    {
-        //        return;
-        //    }
-
-        //    currentWaferIndex++;
-        //    int count = defectList.Items.Count;
-
-        //    defectList.SelectedIndex = currentWaferIndex;
-
-        //    txtDefectOnWafer.Text = $"전체 디펙: {currentWaferIndex + 1}/{count}";
-        //    //var vm = this.DataContext as TiffImageLoaderViewModel;
-        //    //vm.LoadDefectImageFromWholeSelected(currentWaferIndex);
-        //    TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
-        //    loader.LoadTiffImage(CurrentFolderPath);
-        //}
-
-
-        //public void PreviousDefectOnWholeWaferButton_Click(object sender, RoutedEventArgs e)
-        //{
-
-        //    if (isChipDataView)
-        //    {
-        //        return;
-        //    }
-
-        //    if (currentWaferIndex > 0)
-        //    {
-        //        currentWaferIndex--;
-        //        wholeWaferDefectCount = defectList.Items.Count;
-
-        //        defectList.SelectedIndex = currentWaferIndex;
-
-        //        txtDefectOnWafer.Text = $"전체 디펙: {currentWaferIndex + 1}/{wholeWaferDefectCount}";
-        //        //var vm = this.DataContext as TiffImageLoaderViewModel;
-        //        //vm.LoadDefectImageFromWholeSelected(currentWaferIndex);
-        //        TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
-        //        loader.LoadTiffImage(CurrentFolderPath);
-        //    }
-        //}
-
-
-        // 칩 내부 다음 결함
-        //public void NextDefectOnChipButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (!isChipDataView)
-        //    {
-        //        return;
-        //    }
-
-        //    if (chipDefectsItems.Count == 0) return;
-
-        //    if (currentChipDefectIndex < chipDefectsItems.Count - 1)
-        //    {
-        //        currentChipDefectIndex++; // 리스트 기준 인덱스 증가
-        //        defectList.SelectedIndex = currentChipDefectIndex; // 리스트에서 해당 인덱스 선택
-
-        //        // 선택된 아이템에서 defectId 가져오기
-        //        dynamic selectedItem = defectList.SelectedItem;
-        //        currentImageIndex = selectedItem != null ? (int)selectedItem.id - 1 : 0;
-
-        //        txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
-
-        //        // 올바른 id로 이미지 로드
-        //        //var vm = this.DataContext as TiffImageLoaderViewModel;
-        //        //vm.LoadDefectImageFromChipOnSelected(currentImageIndex);
-        //        TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
-        //        loader.LoadTiffImage(CurrentFolderPath);
-        //    }
-        //}
-
-
-        // 칩 내부 이전 결함
-        //public void PreviousDefectOnChipButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (!isChipDataView)
-        //    {
-        //        return;
-        //    }
-
-        //    if (chipDefectsItems.Count == 0) return;
-
-        //    if (currentChipDefectIndex > 0)
-        //    {
-        //        currentChipDefectIndex--;
-        //        defectList.SelectedIndex = currentChipDefectIndex;
-
-        //        // 선택된 아이템에서 defectId 가져오기
-        //        dynamic selectedItem = defectList.SelectedItem;
-        //        currentImageIndex = selectedItem != null ? (int)selectedItem.id - 1 : 0;
-
-        //        txtDefectOnChip.Text = $"칩 내 디펙: {currentChipDefectIndex + 1}/{chipDefectsItems.Count}";
-
-        //        //var vm = this.DataContext as TiffImageLoaderViewModel;
-        //        //vm.LoadDefectImageFromChipOnSelected(currentImageIndex);
-        //        TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
-        //        loader.LoadTiffImage(CurrentFolderPath);
-
-        //    }
-        //}
-        //public void ClearDefectImage()
-        //{
-        //    CurrentImage.Source = null;
-        //    NoImageText.Visibility = Visibility.Visible;
-        //}
+        
 
     }
 }
