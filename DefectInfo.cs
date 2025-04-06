@@ -37,10 +37,18 @@ namespace DefectViewProgram
             return $"{DefectId},{XRel},{YRel},{XIndex},{YIndex},{XSize},{YSize}";
         }
 
-        public void WriteDefectInfo(DefectInfo defectInfo)
+        public void WriteDefectInfo()
         {
-            ChipInfo chipInfo = new ChipInfo(XIndex, YIndex);
-            chipInfo.AddDefect(defectInfo);
+            var key = Tuple.Create(XIndex, YIndex);
+
+            if (!ChipInfo.chipDefects.ContainsKey(key))
+            {
+                ChipInfo.chipDefects[key] = new List<DefectInfo>();
+            }
+
+            ChipInfo.chipDefects[key].Add(this);
+            //Console.WriteLine($"WriteDefectInfo Parsed Coordinates: ({XIndex}, {YIndex})"); // 디버깅 출력 추가
+            //Console.WriteLine($"Key: ({key}) Value: [{string.Join(" | ", ChipInfo.chipDefects[key])}]");
         }
     }
 }       

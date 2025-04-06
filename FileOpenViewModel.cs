@@ -341,42 +341,52 @@ namespace DefectViewProgram
                 SelectedFileName = FileListBox.SelectedItem.ToString();
                 FullPath = Path.Combine(CurrentFolderPath, SelectedFileName);
 
-                Console.WriteLine(FullPath);
+                //Console.WriteLine(FullPath);
 
                 KlarfFileParser parser = new KlarfFileParser();
 
                 parser.ParseText(FullPath);
 
                 string defectInfo = chip.GetAllDefects();
-
-                //ObservableCollection<object> items = new ObservableCollection<object>();
+                Console.WriteLine($"DefectInfo: {defectInfo}");
 
                 string[] lines = defectInfo.Split('\n');
                 
+
+
                 DefectList.Clear();
 
                 foreach (string line in lines)
                 {
                     string[] parts = line.Split(',');
-                    if (parts.Length < 7) continue;
+                    Console.WriteLine("parts: " + string.Join(", ", parts));
 
-                    DefectList.Add(new DefectInfo
+                    for (int i = 0; i < parts.Length - 6 ; i += 7)
                     {
-                        DefectId = int.Parse(parts[2]),
-                        XRel = double.Parse(parts[3]),
-                        YRel = double.Parse(parts[4]),
-                        XIndex = int.Parse(parts[5]),
-                        YIndex = int.Parse(parts[6]),
-                        XSize = int.Parse(parts[7]),
-                        YSize = int.Parse(parts[8])
-                    });
+                        try
+                        {
+                            DefectList.Add(new DefectInfo
+                            {
+                                DefectId = int.Parse(parts[i]),
+                                XRel = double.Parse(parts[i + 1]),
+                                YRel = double.Parse(parts[i + 2]),
+                                XIndex = int.Parse(parts[i + 3]),
+                                YIndex = int.Parse(parts[i + 4]),
+                                XSize = int.Parse(parts[i + 5]),
+                                YSize = int.Parse(parts[i + 6])
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }
+
                 }
-            
+
                 WaferInformation = parser.waferInfo;
 
                 FileSelected?.Invoke(CurrentFolderPath);
 
-                //DefectItems.ItemsSource = allDefectsItems;
                 currentWaferIndex = 0;
                 currentChipDefectIndex = 0;
                 IsSelectedKlarfFile = true;
@@ -387,12 +397,12 @@ namespace DefectViewProgram
                 {
                     MainViewModel.tiffLoaderViewModel.LoadTiffImage(CurrentFolderPath);
                 }
+
+                if (MainViewModel != null && MainViewModel.waferMapViewModel != null)
+                {
+                    MainViewModel.waferMapViewModel.DrawWaferMap(WaferInformation);
+                }
             }
         }
-
-
-
-        
-
     }
 }

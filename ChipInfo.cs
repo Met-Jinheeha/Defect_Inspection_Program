@@ -23,26 +23,17 @@ namespace DefectViewProgram
 
         }
 
-        public static Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
-        //public Dictionary<Point, List<DefectInfo>> ChipDefect
-        //{
-        //    get => chipDefects;
-        //    set => chipDefects = value;
-        //}
+        public static Dictionary<Tuple<int, int>, List<DefectInfo>> chipDefects = new Dictionary<Tuple<int, int>, List<DefectInfo>>();
 
 
-        //public override string ToString()
-        //{
-        //    return $"{ChipIndex.x},{ChipIndex.y},{chipDefects.Values}";
-        //}
-
-        public void AddDefect(DefectInfo defectData)
+        public void AddDefect(Tuple<int, int> chipIndex, DefectInfo defectData)
         {
-            if (!chipDefects.ContainsKey(ChipIndex))
+            if (!chipDefects.ContainsKey(chipIndex))
             {
-                chipDefects[ChipIndex] = new List<DefectInfo>(); // 없을 경우 디펙인포 리스트 밸류값 객체
+                chipDefects[chipIndex] = new List<DefectInfo>();
             }
-            chipDefects[ChipIndex].Add(defectData); // 키값에 이미 값이 있을 경우 리스트에 객체 추가
+            chipDefects[chipIndex].Add(defectData);
+            Console.WriteLine($"ADD Defect: ({chipIndex}, {chipDefects[chipIndex]})"); // 디버깅 출력 추가
         }
 
         /// <summary>
@@ -54,7 +45,7 @@ namespace DefectViewProgram
 
             foreach (var kvp in chipDefects)
             {
-                sb.AppendLine($"{kvp.Key},{string.Join(",", kvp.Value)}");
+                sb.AppendLine($"{string.Join(",", kvp.Value)}");
             }
 
             string result = sb.ToString();
@@ -62,25 +53,17 @@ namespace DefectViewProgram
             return result;
         }
 
-
         public List<DefectInfo> GetDefects(int xIndex, int yIndex)
         {
-            List<DefectInfo> result = new List<DefectInfo>();
-
-            foreach (var entry in chipDefects)
-            {
-                Point key = entry.Key;
-                if (key.x == xIndex && key.y == yIndex)
-                {
-                    result.AddRange(entry.Value);
-                }
-            }
-            return result;
+            var key = Tuple.Create(xIndex, yIndex);
+            return chipDefects.TryGetValue(key, out var defects) ? defects : new List<DefectInfo>();
         }
 
         public void ChipDefectClear()
         {
             chipDefects.Clear();
         }
+
+        
     }
 }

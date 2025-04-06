@@ -17,7 +17,13 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1"/>
+            <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Canvas x:Name="WaferCanvas" Width="550" Height="550" Background="WhiteSmoke">
+                        <!-- 셀은 코드에서 동적으로 추가됩니다 -->
+                    </Canvas>
+                </ScrollViewer>
+            </Border>
             <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
                 <Grid>
                     <TextBlock x:Name="NoImageText" 
@@ -29,7 +35,6 @@
                     <Image x:Name="CurrentImage" Stretch="Uniform" Visibility="Visible" Source="{Binding tiffLoaderViewModel.CurrentImage}"/>
                 </Grid>
             </Border>
-
 
             <Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1">
                 <Grid>
@@ -91,10 +96,7 @@
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
                                 <Button Content="◀" Width="40" Height="30" Margin="5" Command="{Binding defectControlViewModel.MoveToPreviousDefectOnWaferCommand}"/>
                                 <!--<TextBlock x:Name="TextDefectOnWafer" Text="전체 디펙: 0/0" VerticalAlignment="Center" Margin="10,0"/>-->
-                                <TextBlock x:Name="TextDefectOnWafer" 
-           Text="{Binding fileOpenViewModel.TextDefectOnWafer}" 
-           VerticalAlignment="Center" 
-           Margin="10,0"/>
+                                <TextBlock x:Name="TextDefectOnWafer" Text="{Binding fileOpenViewModel.TextDefectOnWafer}" VerticalAlignment="Center" Margin="10,0"/>
                                 <Button Content="▶" Width="40" Height="30" Margin="5" Command="{Binding defectControlViewModel.MoveToNextDefectOnWaferCommand}"/>
                             </StackPanel>
 

@@ -31,6 +31,8 @@ namespace DefectViewProgram
 
             // Wafer정보 입력
             int defectListLine = -1;
+            int gridLineList = -1;
+            int gridListEndLine = -1;
             for (int i = 0; i < lines.Length; i++)
             {
                 sampleInfo[0] = lines[1]; // 시간
@@ -43,6 +45,18 @@ namespace DefectViewProgram
                 sampleInfo[7] = lines[15];// 웨이퍼아이디
                 sampleInfo[8] = lines[16];// Slot 넘버
 
+                if (lines[i].Contains("SampleTestPlan"))
+                {
+                    gridLineList = i;
+                    continue;
+                }
+
+                if (lines[i].Contains("AreaPerTest"))
+                {
+                    gridListEndLine = i;
+                    continue;
+                }
+
                 // "DefectList"가 있는 줄 찾기
                 if (lines[i].Contains("DefectList"))
                 {
@@ -54,6 +68,25 @@ namespace DefectViewProgram
             WaferInfo wafer = new WaferInfo(sampleInfo);
             waferInfo = wafer.ToString();
 
+            // 그리드 정보 리스트에 할당
+            //List<string> gridList = new List<string>();
+
+            if (gridLineList != -1)
+            {
+                for (int i = gridLineList + 1; i < gridListEndLine; i++)
+                {
+                    //gridList.Add(lines[i]);
+                    string[] temp = lines[i].Split(' ');
+                    if (temp[1].Contains(';')){
+                        temp[1] = temp[1].Substring(0, temp[1].Length - 1);
+                    }
+                    int x = int.Parse(temp[0]);
+                    int y = int.Parse(temp[1]);
+                    ChipInfo chipInfo = new ChipInfo(x, y);
+                    wafer.WriteWholeGridPoint(chipInfo);
+                }
+            }
+
             // 찾은 줄 다음부터 처리 시작
             if (defectListLine != -1)
             {
@@ -62,9 +95,9 @@ namespace DefectViewProgram
                     defectInfo = lines[i].Split(' '); // 디펙하나 483개 중에 한줄
 
                     DefectInfo defectDetails = new DefectInfo(defectInfo); // Defect 정보를 반복적으로 초기화
-                    defectDetails.WriteDefectInfo(defectDetails);
+                    defectDetails.WriteDefectInfo();
                 }
-            }
+            } // 여기까지 디펙칩, 디펙정보 갱신. 다음 또 인스턴스를 새로 만들어서 
         }
     }
 }

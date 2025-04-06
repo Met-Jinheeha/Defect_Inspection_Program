@@ -121,6 +121,7 @@ namespace DefectViewProgram
             get; set;
         }
 
+        public static List<Point> wholeGridList = new List<Point>();
 
         public WaferInfo(string[] waferInfoContent)
         {
@@ -156,5 +157,39 @@ namespace DefectViewProgram
                           $"SlotId: {SlotId}";
             return Content;
         }
-    }
+
+
+        public void WriteWholeGridPoint(ChipInfo chipInfo)
+        {
+            wholeGridList.Add(chipInfo.ChipIndex);
+        }
+
+        /// <summary>
+        /// 전체 그리드 중 정상 좌표와 비정상 좌표를 분류하여 반환합니다.
+        /// </summary>
+        /// <returns>정상 및 비정상 좌표 목록이 포함된 튜플</returns>
+        //public static (List<Point> normalPoints, List<Point> abnormalPoints) ClassifyGridPoints()
+        //{
+        //    List<Point> normalPoints = new List<Point>();
+        //    List<Point> abnormalPoints = new List<Point>();
+
+        //    foreach (Point point in wholeGridList)
+        //    {
+        //        if (ChipInfo.chipDefects.ContainsKey(point))
+        //        {
+        //            abnormalPoints.Add(point);
+        //        }
+        //        else
+        //        {
+        //            normalPoints.Add(point);
+        //        }
+        //    }          
+        //    return (normalPoints, abnormalPoints);
+        //}
+
+
+
+
+
+}
 }

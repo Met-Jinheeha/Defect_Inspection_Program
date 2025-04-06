@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace DefectViewProgram
 {
@@ -25,6 +26,8 @@ namespace DefectViewProgram
             // FileOpenViewModel에 UI 요소 연결
             mainViewModel.fileOpenViewModel.FolderTreeView = this.FolderTreeView;
             mainViewModel.fileOpenViewModel.FileListBox = this.FileListBox;
+
+            mainViewModel.waferMapViewModel.SetCanvas(this.WaferCanvas);
         }
     }
 }
