@@ -3,14 +3,13 @@ using System.Windows.Input;
 
 namespace DefectViewProgram
 {
-    public class RelayCommand : ICommand
+    public class RelayCommand<T> : ICommand
     {
-        private readonly Action _execute;
-        private readonly Func<bool> _canExecute;
+        Action<T> _execute;
+        Predicate<T> _canExecute;
 
-        public RelayCommand(Action execute) : this(execute, null) { }
-
-        public RelayCommand(Action execute, Func<bool> canExecute)
+        public RelayCommand(Action<T> execute) : this(execute, null) { }
+        public RelayCommand(Action<T> execute, Predicate<T> canExecute)
         {
             if (execute == null) throw new ArgumentNullException(nameof(execute));
             _execute = execute;
@@ -19,12 +18,12 @@ namespace DefectViewProgram
 
         public bool CanExecute(object parameter)
         {
-            return _canExecute == null ? true : _canExecute();
+            return _canExecute == null ? true : _canExecute.Invoke((T)parameter);
         }
 
         public void Execute(object parameter)
         {
-            _execute();
+            _execute.Invoke((T)parameter);
         }
 
         public event EventHandler CanExecuteChanged

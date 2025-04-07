@@ -6,76 +6,44 @@ using System.Threading.Tasks;
 
 namespace DefectViewProgram
 {
-    class ChipInfo
+    public class ChipInfo
     {
-        public Point ChipIndex
+
+        public Dictionary<(int, int), List<DefectInfo>> chipDefects = new Dictionary<(int, int), List<DefectInfo>>(); // 디펙 인포 객체가 반복적으로 들어가면서 쌓임
+
+
+        public void AddDefect(DefectInfo defect)
         {
-            get; set;
+            var key = (defect.XIndex, defect.YIndex);
+            if (!chipDefects.ContainsKey(key))
+                chipDefects[key] = new List<DefectInfo>();
+
+            chipDefects[key].Add(defect);
         }
 
-        public ChipInfo(int x, int y)
-        {
-            ChipIndex = new Point(x, y);
-        }
 
-        public ChipInfo()
-        {
-
-        }
-
-        public static Dictionary<Point, List<DefectInfo>> chipDefects = new Dictionary<Point, List<DefectInfo>>();
-        //public Dictionary<Point, List<DefectInfo>> ChipDefect
-        //{
-        //    get => chipDefects;
-        //    set => chipDefects = value;
-        //}
-
-
-        //public override string ToString()
-        //{
-        //    return $"{ChipIndex.x},{ChipIndex.y},{chipDefects.Values}";
-        //}
-
-        public void AddDefect(DefectInfo defectData)
-        {
-            if (!chipDefects.ContainsKey(ChipIndex))
-            {
-                chipDefects[ChipIndex] = new List<DefectInfo>(); // 없을 경우 디펙인포 리스트 밸류값 객체
-            }
-            chipDefects[ChipIndex].Add(defectData); // 키값에 이미 값이 있을 경우 리스트에 객체 추가
-        }
-
-        /// <summary>
-        /// StringBuilder 
-        /// </summary>
         public string GetAllDefects()
         {
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var kvp in chipDefects)
+            var sb = new StringBuilder();
+            foreach (var list in chipDefects.Values)
             {
-                sb.AppendLine($"{kvp.Key},{string.Join(",", kvp.Value)}");
+                foreach (var defect in list)
+                    sb.AppendLine(defect.ToString());
             }
-
-            string result = sb.ToString();
-            Console.WriteLine(result);
-            return result;
+            return sb.ToString();
         }
 
 
         public List<DefectInfo> GetDefects(int xIndex, int yIndex)
         {
-            List<DefectInfo> result = new List<DefectInfo>();
+            var key = (xIndex, yIndex);
+            return chipDefects.ContainsKey(key) ? chipDefects[key] : new List<DefectInfo>();
+        }
 
-            foreach (var entry in chipDefects)
-            {
-                Point key = entry.Key;
-                if (key.x == xIndex && key.y == yIndex)
-                {
-                    result.AddRange(entry.Value);
-                }
-            }
-            return result;
+        public bool HasChipDefect(int xIndex, int yIndex)
+        {
+            var key = (xIndex, yIndex);
+            return chipDefects.ContainsKey(key) ? true : false;
         }
 
         public void ChipDefectClear()

@@ -52,13 +52,12 @@ namespace DefectViewProgram
                         tiffFrames.Add(frame);
                     }
 
-                    currentFrameIndex = 1;
+                    currentFrameIndex = 0;
 
                     if (tiffFrames.Count > 0) // 프레임이 있으면 첫 번째 프레임 표시
                     {
 
                         CurrentImage = tiffFrames[currentFrameIndex];
-                        Console.WriteLine($"이미지 크기: {tiffFrames[currentFrameIndex].PixelWidth}x{tiffFrames[currentFrameIndex].PixelHeight}");
                     }
                     else
                     {
@@ -80,8 +79,10 @@ namespace DefectViewProgram
             Console.WriteLine($"CurrentImage 설정됨: {CurrentImage != null}");
         }
 
+
         public void LoadDefectImageFromWholeSelected(int currentWholeWaferIndex) // 전체 디펙 이미지 보여주기
         {
+
             CurrentImage = tiffFrames[currentWholeWaferIndex];
         }
 

@@ -7,22 +7,15 @@ using System.Windows;
 
 namespace DefectViewProgram
 {
-    class DefectInfo
+    public class DefectInfo
     {
         public int DefectId { get; set; }
-
         public double XRel { get; set; }
-
         public double YRel { get; set; }
-
         public int XIndex { get; set; }
-
         public int YIndex { get; set; }
-
         public int XSize { get; set; }
-
         public int YSize { get; set; }
-
 
         public DefectInfo(string[] content)
         {
@@ -36,18 +29,12 @@ namespace DefectViewProgram
             YSize = int.Parse(content[6]);
         }
         public DefectInfo()
-        { 
+        {
         }
 
         public override string ToString()
         {
             return $"{DefectId},{XRel},{YRel},{XIndex},{YIndex},{XSize},{YSize}";
-        }
-
-        public void WriteDefectInfo(DefectInfo defectInfo)
-        {
-            ChipInfo chipInfo = new ChipInfo(XIndex, YIndex);
-            chipInfo.AddDefect(defectInfo);
         }
     }
 }       
