@@ -59,6 +59,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Point.cs" />
+    <Compile Include="WaferInfo.cs" />
     <Compile Include="WaferMapViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -76,8 +78,7 @@
     <Compile Include="RelayCommadGenerics.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="TiffImageLoaderViewModel.cs" />
-    <Compile Include="WaferInfo.cs" />
-    <Compile Include="Point.cs" />
+    <Compile Include="RecipeInfo.cs" />
     <Compile Include="DefectInfo.cs" />
     <Compile Include="KlarfFileParser.cs" />
     <Compile Include="MainWindow.xaml.cs">

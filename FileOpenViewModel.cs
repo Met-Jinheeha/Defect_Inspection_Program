@@ -32,14 +32,6 @@ namespace DefectViewProgram
             set => selectedFileName = value;
         }
 
-        //private TreeView folderTreeView;
-        //public TreeView FolderTreeView
-        //{
-        //    get => folderTreeView;
-        //    set => SetProperty(ref folderTreeView, value);
-        //}
-
-
         // 뷰에서 참조할 UI 요소에 대한 속성들
         private System.Windows.Controls.TreeView folderTreeView;
         public System.Windows.Controls.TreeView FolderTreeView
@@ -97,10 +89,6 @@ namespace DefectViewProgram
 
         // 선택된 Tiff 이미지 인덱스
         public int currentImageIndex = 0;
-
-
-        private ObservableCollection<object> allDefectsItems = new ObservableCollection<object>();
-        private ObservableCollection<object> chipDefectsItems = new ObservableCollection<object>();
 
 
         private string buttonMessage = "폴더선택을로직에서";
@@ -288,20 +276,6 @@ namespace DefectViewProgram
             }
         }
 
-
-        //public void ShowAllList(object sender, RoutedEventArgs e)
-        //{
-        //    defectList.ItemsSource = allDefectsItems;
-        //    currentWaferIndex = 0;
-        //    currentChipDefectIndex = 0;
-        //    txtDefectOnWafer.Text = $"전체 디펙: 1/{allDefectsItems.Count}";
-
-        //    TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
-        //    loader.LoadTiffImage(CurrentFolderPath);
-        //    isChipDataView = false;
-        //}
-
-
         private string textDefectOnWafer = "전체 디펙: 0/0";
         public string TextDefectOnWafer
         {
@@ -335,15 +309,14 @@ namespace DefectViewProgram
         {
             if (FileListBox.SelectedItem != null)
             {
-                ChipInfo chip = new ChipInfo();
-                chip.ChipDefectClear();
-
+               
                 SelectedFileName = FileListBox.SelectedItem.ToString();
                 FullPath = Path.Combine(CurrentFolderPath, SelectedFileName);
 
-                //Console.WriteLine(FullPath);
+                ChipInfo chip = new ChipInfo();
+                chip.ChipDefectClear();
 
-                KlarfFileParser parser = new KlarfFileParser();
+                KlarfFileParser parser = new KlarfFileParser(chip);
 
                 parser.ParseText(FullPath);
 
@@ -352,14 +325,11 @@ namespace DefectViewProgram
 
                 string[] lines = defectInfo.Split('\n');
                 
-
-
                 DefectList.Clear();
 
                 foreach (string line in lines)
                 {
                     string[] parts = line.Split(',');
-                    Console.WriteLine("parts: " + string.Join(", ", parts));
 
                     for (int i = 0; i < parts.Length - 6 ; i += 7)
                     {
@@ -380,7 +350,6 @@ namespace DefectViewProgram
                         {
                         }
                     }
-
                 }
 
                 WaferInformation = parser.waferInfo;

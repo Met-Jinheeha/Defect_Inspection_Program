@@ -58,7 +58,6 @@ namespace DefectViewProgram
                     {
 
                         CurrentImage = tiffFrames[currentFrameIndex];
-                        Console.WriteLine($"이미지 크기: {tiffFrames[currentFrameIndex].PixelWidth}x{tiffFrames[currentFrameIndex].PixelHeight}");
                     }
                     else
                     {

@@ -17,6 +17,16 @@ namespace DefectViewProgram
 
         public string waferInfo = "";
 
+        private ChipInfo chipInfo;
+
+        public KlarfFileParser(ChipInfo chipInfo)
+        {
+            this.chipInfo = chipInfo;
+        }
+
+        public KlarfFileParser()
+        {
+        }
 
         public void ParseText(string filePath)
         {
@@ -65,8 +75,10 @@ namespace DefectViewProgram
                 }
             }
 
-            WaferInfo wafer = new WaferInfo(sampleInfo);
-            waferInfo = wafer.ToString();
+            RecipeInfo recipeInfo = new RecipeInfo(sampleInfo);
+            waferInfo = recipeInfo.ToString();
+
+            WaferInfo wafer = new WaferInfo(recipeInfo);
 
             // 그리드 정보 리스트에 할당
             //List<string> gridList = new List<string>();
@@ -75,15 +87,14 @@ namespace DefectViewProgram
             {
                 for (int i = gridLineList + 1; i < gridListEndLine; i++)
                 {
-                    //gridList.Add(lines[i]);
                     string[] temp = lines[i].Split(' ');
                     if (temp[1].Contains(';')){
                         temp[1] = temp[1].Substring(0, temp[1].Length - 1);
                     }
                     int x = int.Parse(temp[0]);
                     int y = int.Parse(temp[1]);
-                    ChipInfo chipInfo = new ChipInfo(x, y);
-                    wafer.WriteWholeGridPoint(chipInfo);
+
+                    wafer.WriteWholeChipGridStatus(x, y, chipInfo);
                 }
             }
 
@@ -95,7 +106,7 @@ namespace DefectViewProgram
                     defectInfo = lines[i].Split(' '); // 디펙하나 483개 중에 한줄
 
                     DefectInfo defectDetails = new DefectInfo(defectInfo); // Defect 정보를 반복적으로 초기화
-                    defectDetails.WriteDefectInfo();
+                    chipInfo.AddDefect(defectDetails);
                 }
             } // 여기까지 디펙칩, 디펙정보 갱신. 다음 또 인스턴스를 새로 만들어서 
         }

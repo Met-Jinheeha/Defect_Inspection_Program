@@ -84,7 +84,7 @@
                         
                         <!-- 상단 영역: 디펙 제어 UI -->
                         <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Margin="35,0,34.6,0">
-                            <TextBlock Text="Wafer Information" FontSize="19"/>
+                            <TextBlock Text="Sample Information" FontSize="19"/>
                             <ScrollViewer Height="162" VerticalScrollBarVisibility="Auto">
                                 <TextBlock x:Name="WaferInfomationText" FontSize="13" TextWrapping="Wrap" Text="{Binding fileOpenViewModel.WaferInformation}"/>
                             </ScrollViewer>

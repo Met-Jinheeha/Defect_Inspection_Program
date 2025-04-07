@@ -12,6 +12,9 @@ namespace DefectViewProgram
     {
         private Canvas waferCanvas;
 
+        private WaferInfo waferInfo;
+ 
+
         // 칩 셀의 크기
         private const int CellSize = 10;
 
@@ -102,6 +105,8 @@ namespace DefectViewProgram
             int cols = (int)(waferDiameter / cellSize);
             int rows = (int)(waferDiameter / cellSize);
 
+            ChipInfo chipInfo = new ChipInfo();
+
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
@@ -123,8 +128,7 @@ namespace DefectViewProgram
                         int gridX = col;
                         int gridY = row;
 
-                        bool isDefect = ChipInfo.chipDefects.ContainsKey(Tuple.Create(gridX, gridY));
-
+                        bool isDefect = chipInfo.HasChipDefect(gridX, gridY);
 
                         var rect = new Rectangle
                         {
@@ -142,13 +146,6 @@ namespace DefectViewProgram
                 }
             }
         }
-
-
-
-
-
-
-
 
 
         //public void DrawWaferMap()
@@ -221,8 +218,8 @@ namespace DefectViewProgram
         private void DrawCell(Point point, int minX, int minY, double scale, SolidColorBrush fillBrush)
         {
             // 캔버스 중앙에 위치하도록 오프셋 계산
-            double xOffset = (waferCanvas.Width - (scale * (WaferInfo.wholeGridList.Count))) / 2;
-            double yOffset = (waferCanvas.Height - (scale * (WaferInfo.wholeGridList.Count))) / 2;
+            double xOffset = (waferCanvas.Width - (scale)) / 2;
+            double yOffset = (waferCanvas.Height - (scale)) / 2;
 
             // 정규화된 위치 계산
             double x = ((point.x - minX) * scale) + xOffset;

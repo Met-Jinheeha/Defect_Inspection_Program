@@ -140,24 +140,6 @@ namespace DefectViewProgram
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         //public void PreviousDefectOnWholeWaferButton_Click(object sender, RoutedEventArgs e)
         //{
 
