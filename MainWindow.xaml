@@ -101,30 +101,36 @@
                             </StackPanel>
 
                              <!--칩 내부 디펙 이동 UI--> 
-                            <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
-                                <Button Content="◀" Width="40" Height="30" Margin="5" Click="PreviousDefectOnChipButton_Click"/>
-                                <TextBlock x:Name="txtDefectOnChip" Text="칩 내 디펙: 0/0" VerticalAlignment="Center" Margin="10,0"/>
-                                <Button Content="▶" Width="40" Height="30" Margin="5" Click="NextDefectOnChipButton_Click"/>
-                            </StackPanel>-->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+                                <Button Content="◀" Width="40" Height="30" Margin="5" Command="{Binding defectControlViewModel.MoveToPreviousDefectOnChipCommand}"/>
+                                <TextBlock x:Name="TextDefectOnChip" Text="{Binding fileOpenViewModel.TextDefectOnChip}" VerticalAlignment="Center" Margin="10,0"/>
+                                <Button Content="▶" Width="40" Height="30" Margin="5" Command="{Binding defectControlViewModel.MoveToNextDefectOnChipCommand}"/>
+                            </StackPanel>
 
                              <!--칩 디펙 조회 입력--> 
-                            <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
-                                <TextBlock Text="칩 좌표:" VerticalAlignment="Center" Margin="5,0"/>
-                                <TextBox x:Name="transferCoordinate1" Width="80" VerticalAlignment="Center" Margin="5,0"/>
-                                <Button Content="칩 Defect 조회" Width="100" Height="30" Margin="5" Click="TransferCoordinateButton_Click"/>
-                                <Button Content="전체 Defect 조회" Width="100" Height="30" Margin="5" Click="ShowAllList"/>
-                            </StackPanel>-->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+                                <Button Content="전체 Defect 조회" Width="100" Height="30" Margin="5" Command="{Binding fileOpenViewModel.ShowAllListCommand}"/>
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                                                   
                     <!-- 하단 영역: 데이터그리드 -->
                     <DockPanel Grid.Row="1" LastChildFill="True">
-                        <DataGrid x:Name="DefectList" AutoGenerateColumns="False" ItemsSource="{Binding fileOpenViewModel.DefectList}"
-                                  SelectedIndex="{Binding fileOpenViewModel.SelectedDefectIndex, Mode=TwoWay}"
-                                  DisplayMemberPath="DefectId">
+                        <DataGrid x:Name="DefectList" AutoGenerateColumns="False" 
+                                   IsReadOnly="True"
+                                   SelectionMode="Single"
+                                   SelectionUnit="FullRow"
+                                   CanUserAddRows="False"
+                                   CanUserDeleteRows="False"
+                                   CanUserResizeColumns="False"
+                                   CanUserSortColumns="False"
+                                   HeadersVisibility="Column"
+                                   ItemsSource="{Binding fileOpenViewModel.DefectList}"
+                                   SelectedIndex="{Binding  fileOpenViewModel.SelectedDefectIndex, Mode=TwoWay}"
+                                   DisplayMemberPath="DefectId">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding defectControlViewModel.DefectListSelectionChangedCommand}"/>
+                                    <i:InvokeCommandAction Command="{Binding defectControlViewModel.OnDefectListSelectionChangedWaferCommand}"/>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                             <DataGrid.Columns>

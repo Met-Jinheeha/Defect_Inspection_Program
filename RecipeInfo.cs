@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DefectViewProgram
 {
-    class RecipeInfo
+    public class RecipeInfo
     {
 
         private string dateTime;

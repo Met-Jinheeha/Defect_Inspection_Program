@@ -32,6 +32,13 @@ namespace DefectViewProgram
             set => selectedFileName = value;
         }
 
+        private bool isShowAllList;
+        public bool IsShowAllList
+        {
+            get => isShowAllList;
+            set => isShowAllList = value;
+        }
+
         // 뷰에서 참조할 UI 요소에 대한 속성들
         private System.Windows.Controls.TreeView folderTreeView;
         public System.Windows.Controls.TreeView FolderTreeView
@@ -82,7 +89,7 @@ namespace DefectViewProgram
         public int wholeWaferDefectCount = 0;
 
         // 전체 칩 인덱스
-        public int currentWaferIndex = 0;
+        public int SelectedIndex = 0;
 
         // 칩 내부 디펙 현재 인덱스
         public int currentChipDefectIndex = 0;
@@ -121,6 +128,8 @@ namespace DefectViewProgram
                 return openFolderCommand;
             }
         }
+
+
 
 
         public void LoadFolders(string path) // 탐색기에서 폴더 선택했을때
@@ -276,11 +285,18 @@ namespace DefectViewProgram
             }
         }
 
-        private string textDefectOnWafer = "전체 디펙: 0/0";
+        private string textDefectOnWafer = "Total Defect: 0/0";
         public string TextDefectOnWafer
         {
             get => textDefectOnWafer;
             set => SetProperty(ref textDefectOnWafer, value);
+        }
+
+        private string textDefectOnChip = "Cell ( , ) Defect 0/0";
+        public string TextDefectOnChip
+        {
+            get => textDefectOnChip;
+            set => SetProperty(ref textDefectOnChip, value);
         }
 
 
@@ -309,6 +325,7 @@ namespace DefectViewProgram
         {
             if (FileListBox.SelectedItem != null)
             {
+                MainViewModel.waferMapViewModel.IsChipSelect = false;
                
                 SelectedFileName = FileListBox.SelectedItem.ToString();
                 FullPath = Path.Combine(CurrentFolderPath, SelectedFileName);
@@ -352,26 +369,91 @@ namespace DefectViewProgram
                     }
                 }
 
-                WaferInformation = parser.waferInfo;
+                WaferInformation = parser.recipeText;
 
                 FileSelected?.Invoke(CurrentFolderPath);
 
-                currentWaferIndex = 0;
+                SelectedIndex = 0;
                 currentChipDefectIndex = 0;
                 IsSelectedKlarfFile = true;
-                SelectedDefectIndex = 0;
-                TextDefectOnWafer = $"전체 디펙: 1/{DefectList.Count}";
+                SelectedDefectIndex = 3;
+                TextDefectOnWafer = $"Total Defect: 1/{DefectList.Count}";
+
 
                 if (MainViewModel != null && MainViewModel.tiffLoaderViewModel != null)
                 {
                     MainViewModel.tiffLoaderViewModel.LoadTiffImage(CurrentFolderPath);
                 }
-
                 if (MainViewModel != null && MainViewModel.waferMapViewModel != null)
                 {
-                    MainViewModel.waferMapViewModel.DrawWaferMap(WaferInformation);
+                    MainViewModel.waferMapViewModel.SetChipInfo(chip);
+                    MainViewModel.waferMapViewModel.DrawWaferMap(parser.WaferInfo);
                 }
             }
         }
+        public void ShowAllList()
+        {
+            IsSelectedKlarfFile = false;
+
+            MainViewModel.waferMapViewModel.IsChipSelect = false;
+
+            SelectedFileName = FileListBox.SelectedItem.ToString();
+            FullPath = Path.Combine(CurrentFolderPath, SelectedFileName);
+
+            ChipInfo chip = new ChipInfo();
+            chip.ChipDefectClear();
+
+            KlarfFileParser parser = new KlarfFileParser(chip);
+
+            parser.ParseText(FullPath);
+
+            string defectInfo = chip.GetAllDefects();
+            Console.WriteLine($"DefectInfo: {defectInfo}");
+
+            string[] lines = defectInfo.Split('\n');
+
+            DefectList.Clear();
+
+            foreach (string line in lines)
+            {
+                string[] parts = line.Split(',');
+
+                for (int i = 0; i < parts.Length - 6; i += 7)
+                {
+                    try
+                    {
+                        DefectList.Add(new DefectInfo
+                        {
+                            DefectId = int.Parse(parts[i]),
+                            XRel = double.Parse(parts[i + 1]),
+                            YRel = double.Parse(parts[i + 2]),
+                            XIndex = int.Parse(parts[i + 3]),
+                            YIndex = int.Parse(parts[i + 4]),
+                            XSize = int.Parse(parts[i + 5]),
+                            YSize = int.Parse(parts[i + 6])
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+        }
+
+        private ICommand showAllListCommand;
+        public ICommand ShowAllListCommand
+        {
+            get
+            {
+                if (showAllListCommand == null)
+                {
+                    showAllListCommand = new RelayCommand(ShowAllList);
+                }
+                return showAllListCommand;
+            }
+        }
+
+
+
     }
 }
