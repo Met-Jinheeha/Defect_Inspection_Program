@@ -22,7 +22,7 @@ namespace DefectViewProgram
             fileOpenViewModel = new FileOpenViewModel();
             fileOpenViewModel.MainViewModel = this;
             defectControlViewModel = new DefectControlViewModel(this);
-            waferMapViewModel = new WaferMapViewModel();
+            waferMapViewModel = new WaferMapViewModel(this);
 
             fileOpenViewModel.FileSelected += folderPath => {
                 tiffLoaderViewModel.LoadTiffImage(folderPath);

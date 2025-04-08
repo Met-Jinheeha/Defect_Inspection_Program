@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace DefectViewProgram
 {
@@ -12,19 +13,20 @@ namespace DefectViewProgram
     {
         private Canvas waferCanvas;
 
-        private WaferInfo waferInfo;
- 
+        private ChipInfo chipInfo;
+        private MainViewModel mainViewModel;
 
-        // 칩 셀의 크기
-        private const int CellSize = 10;
+        // 현재 WaferInfo 저장
+        private WaferInfo currentWaferInfo = null;
 
-        // 색상 정의
-        private static readonly SolidColorBrush NormalBrush = Brushes.Green;
-        private static readonly SolidColorBrush DefectBrush = Brushes.Red;
-        private static readonly SolidColorBrush BorderBrush = Brushes.Black;
-
-        public WaferMapViewModel()
+        public void SetChipInfo(ChipInfo chipInfo)
         {
+            this.chipInfo = chipInfo;
+        }
+
+        public WaferMapViewModel(MainViewModel mainVM)
+        {
+            this.mainViewModel = mainVM;
         }
 
         public void SetCanvas(Canvas canvas)
@@ -32,219 +34,246 @@ namespace DefectViewProgram
             this.waferCanvas = canvas;
         }
 
-
-        //public void DrawWaferMap(string waferInfo)
-        //{
-        //    if (waferCanvas == null) return;
-        //    waferCanvas.Children.Clear();
-
-        //    int cellSize = 20;
-        //    int centerX = (int)(waferCanvas.Width / 2 / cellSize);
-        //    int centerY = (int)(waferCanvas.Height / 2 / cellSize);
-        //    int radius = Math.Min(centerX, centerY) - 1;
-
-        //    // 웨이퍼 외곽 원 그리기
-        //    Ellipse waferOutline = new Ellipse
-        //    {
-        //        Width = radius * 2 * cellSize,
-        //        Height = radius * 2 * cellSize,
-        //        Stroke = Brushes.Black,
-        //        StrokeThickness = 2,
-        //        Fill = Brushes.Transparent
-        //    };
-        //    Canvas.SetLeft(waferOutline, (centerX - radius) * cellSize);
-        //    Canvas.SetTop(waferOutline, (centerY - radius) * cellSize);
-        //    waferCanvas.Children.Add(waferOutline);
-
-        //    // 칩 그리기
-        //    foreach (Point p in WaferInfo.wholeGridList)
-        //    {
-        //        // 원형 웨이퍼 내부에 있는지 확인
-        //        double distFromCenter = Math.Sqrt(Math.Pow(p.x - centerX, 2) + Math.Pow(p.y - centerY, 2));
-        //        if (distFromCenter > radius) continue;
-
-        //        Rectangle rect = new Rectangle
-        //        {
-        //            Width = cellSize,
-        //            Height = cellSize,
-        //            Stroke = Brushes.Black,
-        //            Fill = ChipInfo.chipDefects.ContainsKey(p) ? Brushes.Red : Brushes.LightGray
-        //        };
-        //        Canvas.SetLeft(rect, p.x * cellSize);
-        //        Canvas.SetTop(rect, p.y * cellSize);
-        //        waferCanvas.Children.Add(rect);
-        //    }
-        //}
-
-        public void DrawWaferMap(string waferInfo)
+        private int selectedDefectCount;
+        public int SelectedDefectCount
         {
-            waferCanvas.Children.Clear();
+            get => selectedDefectCount;
+            set => selectedDefectCount = value;
 
-            double waferDiameter = 300;
-            double waferRadius = waferDiameter / 2;
-            double cellSize = 25;
+        }
 
-            var wafer = new Ellipse
+        private bool isChipSelect;
+        public bool IsChipSelect
+        {
+            get => isChipSelect;
+            set => isChipSelect = value;
+
+        }
+
+        // 현재 선택된 디펙트 좌표
+        private (int, int)? selectedDefectCoord = null;
+
+        // 색상 정의
+        private static readonly SolidColorBrush NormalBrush = Brushes.Green;
+        private static readonly SolidColorBrush DefectBrush = Brushes.Red;
+        private static readonly SolidColorBrush SelectedBrush = Brushes.Black;
+        private static readonly SolidColorBrush BorderBrush = Brushes.Black;
+
+        // 선택된 디펙트 좌표 설정하는 메서드
+        public void SetSelectedDefect((int, int) coord)
+        {
+            selectedDefectCoord = coord;
+            // 웨이퍼 맵 다시 그리기 (선택된 셀 반영)
+            if (waferCanvas != null)
+                DrawWaferMap(this.currentWaferInfo);
+        }
+
+
+        // 셀 클릭 커맨드
+        private ICommand cellClickCommand;
+        public ICommand CellClickCommand
+        {
+            get
             {
-                Width = waferDiameter,
-                Height = waferDiameter,
-                Fill = Brushes.LightGray,
-                Stroke = Brushes.Black,
-                StrokeThickness = 2
-            };
-
-            double canvasWidth = waferCanvas.ActualWidth;
-            double canvasHeight = waferCanvas.ActualHeight;
-            double centerX = canvasWidth / 2;
-            double centerY = canvasHeight / 2;
-
-            Canvas.SetLeft(wafer, centerX - waferRadius);
-            Canvas.SetTop(wafer, centerY - waferRadius);
-            waferCanvas.Children.Add(wafer);
-
-            int cols = (int)(waferDiameter / cellSize);
-            int rows = (int)(waferDiameter / cellSize);
-
-            ChipInfo chipInfo = new ChipInfo();
-
-            for (int row = 0; row < rows; row++)
-            {
-                for (int col = 0; col < cols; col++)
+                if (cellClickCommand == null)
                 {
-                    double x = col * cellSize + (centerX - waferRadius);
-                    double y = row * cellSize + (centerY - waferRadius);
+                    cellClickCommand = new RelayCommand<object>(ExecuteCellClick);
+                }
+                return cellClickCommand;
+            }
+        }
 
-                    // 셀 중심 좌표
-                    double cellCenterX = x + cellSize / 2;
-                    double cellCenterY = y + cellSize / 2;
+        private List<DefectInfo> cellDefects;
+        public  List<DefectInfo> CellDefect
+        {
+            get; set;
+        }
 
-                    // 중심에서 거리
-                    double dx = cellCenterX - centerX;
-                    double dy = cellCenterY - centerY;
-                    double distance = Math.Sqrt(dx * dx + dy * dy);
+        private int xSelectedIndex;
+        public int XSelectedIndex
+        {
+            get => xSelectedIndex;
+            set => xSelectedIndex = value;
 
-                    if (distance <= waferRadius)
+        }
+
+        private int ySelectedIndex;
+        public int YSelectedIndex
+        {
+            get => ySelectedIndex;
+            set => ySelectedIndex = value;
+
+        }
+
+
+        /// <summary>
+        /// 웨이퍼 맵에서 그리드를 눌렀을 때
+        /// </summary>
+        /// <param name="parameter"></param>
+        private void ExecuteCellClick(object parameter)
+        {
+            IsChipSelect = true;
+
+            if (parameter is ValueTuple<int, int> clickedCoord)
+            {
+                XSelectedIndex = clickedCoord.Item1;
+                YSelectedIndex = clickedCoord.Item2;
+
+                // 해당 셀의 디펙트 목록 가져오기
+                if (chipInfo != null)
+                {
+                    CellDefect = chipInfo.GetDefects(XSelectedIndex, YSelectedIndex);
+
+                    // FileOpenViewModel의 DefectList 업데이트
+                    if (mainViewModel?.fileOpenViewModel != null)
                     {
-                        int gridX = col;
-                        int gridY = row;
-
-                        bool isDefect = chipInfo.HasChipDefect(gridX, gridY);
-
-                        var rect = new Rectangle
+                        mainViewModel.fileOpenViewModel.DefectList.Clear();
+                        foreach (var defect in CellDefect)
                         {
-                            Width = cellSize,
-                            Height = cellSize,
-                            Fill = isDefect ? Brushes.Red : Brushes.Green,
-                            Stroke = Brushes.Black,
-                            StrokeThickness = 0.5
-                        };
+                            mainViewModel.fileOpenViewModel.DefectList.Add(defect);
+                        }
 
-                        Canvas.SetLeft(rect, x);
-                        Canvas.SetTop(rect, y);
-                        waferCanvas.Children.Add(rect);
+                        int SelectedDefectCount = mainViewModel.defectControlViewModel.SelectedIndex;
+
+                        if (CellDefect.Count == 0)
+                        {
+                            SelectedDefectCount = -1;
+                        }
+
+                        mainViewModel.defectControlViewModel.ChipSelectedIndex = 0;
+                        mainViewModel.defectControlViewModel.SelectedIndex = 0;
+                        mainViewModel.fileOpenViewModel.SelectedDefectIndex = 0;
+
+                        if (mainViewModel.fileOpenViewModel.DefectList.Count > 0)
+                        {
+                            mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(
+                                mainViewModel.fileOpenViewModel.DefectList[0].DefectId - 1);
+                        }
+
+                        var coord = (XSelectedIndex, YSelectedIndex);
+                        SetSelectedDefect(coord);
+
+                        mainViewModel.fileOpenViewModel.TextDefectOnChip =
+                            $"Cell ({XSelectedIndex}, {YSelectedIndex}) Defect: {SelectedDefectCount + 1}/{CellDefect.Count}";
                     }
                 }
             }
         }
 
-
-        //public void DrawWaferMap()
-        //{
-        //    waferCanvas.Children.Clear();
-
-        //    // 정상 및 비정상 포인트 분류
-        //    List<Point> normalPoints = new List<Point>();
-        //    List<Point> abnormalPoints = new List<Point>();
-
-        //    foreach (Point point in WaferInfo.wholeGridList)
-        //    {
-        //        if (ChipInfo.chipDefects.ContainsKey(point))
-        //        {
-        //            abnormalPoints.Add(point);
-        //        }
-        //        else
-        //        {
-        //            normalPoints.Add(point);
-        //        }
-        //    }
-
-        //    // 좌표 정규화 (캔버스에 맞게 조정)
-        //    NormalizeAndDrawPoints(normalPoints, abnormalPoints);
-        //}
-
-        private void NormalizeAndDrawPoints(List<Point> normalPoints, List<Point> abnormalPoints)
+        public void DrawWaferMap(WaferInfo waferInfo)
         {
-            // 모든 점을 하나의 리스트로 합치기 (정규화 계산용)
-            List<Point> allPoints = new List<Point>();
-            allPoints.AddRange(normalPoints);
-            allPoints.AddRange(abnormalPoints);
 
-            if (allPoints.Count == 0) return;
+            // null 체크 추가
+            if (waferInfo == null || waferInfo.chipInfoList == null)
+            {
+                Console.WriteLine("waferInfo 또는 chipInfoList가 null입니다.");
+                return;
+            }
+            // 현재 정보 저장
+            this.currentWaferInfo = waferInfo;
+            waferCanvas.Children.Clear();
 
-            // x, y 좌표의 최소, 최대값 찾기
+            // 웨이퍼 크기 설정
+            double waferDiameter = Math.Min(waferCanvas.ActualWidth, waferCanvas.ActualHeight) * 0.8;
+            double waferRadius = waferDiameter / 2;
+
+            // 캔버스 중앙 좌표
+            double centerX = waferCanvas.ActualWidth / 2;
+            double centerY = waferCanvas.ActualHeight / 2;
+
+
+            // 좌표 범위 계산
             int minX = int.MaxValue, minY = int.MaxValue;
             int maxX = int.MinValue, maxY = int.MinValue;
 
-            foreach (Point p in allPoints)
+            foreach (var key in waferInfo.chipInfoList.Keys)
             {
-                minX = Math.Min(minX, p.x);
-                minY = Math.Min(minY, p.y);
-                maxX = Math.Max(maxX, p.x);
-                maxY = Math.Max(maxY, p.y);
+                minX = Math.Min(minX, key.Item1);
+                minY = Math.Min(minY, key.Item2);
+                maxX = Math.Max(maxX, key.Item1);
+                maxY = Math.Max(maxY, key.Item2);
             }
 
-            // 스케일 계산 (캔버스 여백 10% 추가)
-            double canvasWidth = waferCanvas.Width * 0.8;
-            double canvasHeight = waferCanvas.Height * 0.8;
-            double xRange = maxX - minX;
-            double yRange = maxY - minY;
+            // 전체 범위 계산
+            int rangeX = maxX - minX;
+            int rangeY = maxY - minY;
 
-            // 스케일 결정 (x축, y축 비율 유지)
-            double scale = Math.Min(canvasWidth / xRange, canvasHeight / yRange);
+            // 셀 크기 계산 (작게 설정)
+            double maxRange = Math.Max(rangeX, rangeY);
+            double cellSize = (waferDiameter * 0.9) / (maxRange + 4);
+            double cellSizeX = (waferDiameter * 2.2) / (maxRange + 4);
+            double cellSizeY = (waferDiameter * 0.9) / (maxRange + 4);
 
-            // 정상 포인트 그리기
-            foreach (Point p in normalPoints)
+            // 오프셋 계산
+            double offsetX = centerX - ((rangeX * cellSizeX) / 2);
+            double offsetY = centerY - ((rangeY * cellSizeY) / 2);
+
+            // 모든 칩 정보 그리기
+            foreach (var kvp in waferInfo.chipInfoList)
             {
-                DrawCell(p, minX, minY, scale, NormalBrush);
-            }
+                var coord = kvp.Key;
+                string status = kvp.Value;
 
-            // 비정상 포인트 그리기
-            foreach (Point p in abnormalPoints)
-            {
-                DrawCell(p, minX, minY, scale, DefectBrush);
+                // 좌표를 캔버스 좌표로 변환
+                double x = ((coord.Item1 - minX) * cellSizeX) + offsetX;
+                double y = ((coord.Item2 - minY) * cellSizeY) + offsetY;
+
+                // 셀의 중심 계산
+                double cellCenterX = x + cellSizeX / 2;
+                double cellCenterY = y + cellSizeY / 2;
+
+                // 웨이퍼 중심에서의 거리 계산
+                double dx = cellCenterX - centerX;
+                double dy = cellCenterY - centerY;
+                double distance = Math.Sqrt(dx * dx + dy * dy);
+
+                // 원형 웨이퍼 안에 있는 칩만 그리기
+                if (distance <= waferRadius - Math.Max(cellSizeX, cellSizeY) / 2)
+                {
+                    // 색상 결정: 선택된 디펙트인 경우 검정색, 아니면 원래 색상
+                    SolidColorBrush fillBrush;
+
+                    if (selectedDefectCoord.HasValue && selectedDefectCoord.Value.Equals(coord))
+                    {
+                        fillBrush = SelectedBrush; // 선택된 디펙트는 검정색
+                    }
+                    else
+                    {
+                        fillBrush = (status == "X") ? DefectBrush : NormalBrush; // X가 불량칩
+                    }
+
+                    var rect = new Rectangle
+                    {
+                        Width = cellSizeX,
+                        Height = cellSizeY,
+                        Fill = fillBrush,
+                        Stroke = BorderBrush,
+                        StrokeThickness = 0.5,
+                        Tag = coord // 좌표 정보 저장
+                    };
+
+                    //rect.MouseLeftButtonDown += OnCellClick;
+
+                    Canvas.SetLeft(rect, x);
+                    Canvas.SetTop(rect, y);
+                    waferCanvas.Children.Add(rect);
+
+                    // 클릭 이벤트를 CommandBinding으로 처리
+                    rect.InputBindings.Add(new MouseBinding(
+                        CellClickCommand,
+                        new MouseGesture(MouseAction.LeftClick))
+                    {
+                        CommandParameter = coord
+                    });
+
+                    // 툴팁 추가
+                    ToolTip tooltip = new ToolTip();
+                    tooltip.Content = $"좌표: ({coord.Item1}, {coord.Item2}), 상태: {status}";
+                    rect.ToolTip = tooltip;
+                }
             }
         }
-
-        private void DrawCell(Point point, int minX, int minY, double scale, SolidColorBrush fillBrush)
-        {
-            // 캔버스 중앙에 위치하도록 오프셋 계산
-            double xOffset = (waferCanvas.Width - (scale)) / 2;
-            double yOffset = (waferCanvas.Height - (scale)) / 2;
-
-            // 정규화된 위치 계산
-            double x = ((point.x - minX) * scale) + xOffset;
-            double y = ((point.y - minY) * scale) + yOffset;
-
-            // 사각형 생성
-            Rectangle rect = new Rectangle
-            {
-                Width = CellSize,
-                Height = CellSize,
-                Fill = fillBrush,
-                Stroke = BorderBrush,
-                StrokeThickness = 1
-            };
-
-            // 캔버스에 추가
-            Canvas.SetLeft(rect, x);
-            Canvas.SetTop(rect, y);
-            waferCanvas.Children.Add(rect);
-
-            // 툴팁 추가 (선택 사항)
-            ToolTip tooltip = new ToolTip();
-            tooltip.Content = $"X: {point.x}, Y: {point.y}";
-            rect.ToolTip = tooltip;
-        }
-
     }
 }
+
+

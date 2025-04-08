@@ -15,7 +15,13 @@ namespace DefectViewProgram
 
         public string[] sampleInfo = new string[9];
 
-        public string waferInfo = "";
+        public string recipeText = "";
+
+        private WaferInfo waferInfo;
+        public WaferInfo WaferInfo
+        {
+            get { return waferInfo; }
+        }
 
         private ChipInfo chipInfo;
 
@@ -76,27 +82,13 @@ namespace DefectViewProgram
             }
 
             RecipeInfo recipeInfo = new RecipeInfo(sampleInfo);
-            waferInfo = recipeInfo.ToString();
+            recipeText = recipeInfo.ToString();
 
-            WaferInfo wafer = new WaferInfo(recipeInfo);
+            waferInfo = new WaferInfo(recipeInfo);
 
-            // 그리드 정보 리스트에 할당
-            //List<string> gridList = new List<string>();
+            int xIndex = 0;
+            int yIndex = 0;
 
-            if (gridLineList != -1)
-            {
-                for (int i = gridLineList + 1; i < gridListEndLine; i++)
-                {
-                    string[] temp = lines[i].Split(' ');
-                    if (temp[1].Contains(';')){
-                        temp[1] = temp[1].Substring(0, temp[1].Length - 1);
-                    }
-                    int x = int.Parse(temp[0]);
-                    int y = int.Parse(temp[1]);
-
-                    wafer.WriteWholeChipGridStatus(x, y, chipInfo);
-                }
-            }
 
             // 찾은 줄 다음부터 처리 시작
             if (defectListLine != -1)
@@ -108,7 +100,23 @@ namespace DefectViewProgram
                     DefectInfo defectDetails = new DefectInfo(defectInfo); // Defect 정보를 반복적으로 초기화
                     chipInfo.AddDefect(defectDetails);
                 }
-            } // 여기까지 디펙칩, 디펙정보 갱신. 다음 또 인스턴스를 새로 만들어서 
+            }
+
+            if (gridLineList != -1)
+            {
+                for (int i = gridLineList + 1; i < gridListEndLine; i++)
+                {
+                    string[] temp = lines[i].Split(' ');
+                    if (temp[1].Contains(';'))
+                    {
+                        temp[1] = temp[1].Substring(0, temp[1].Length - 1);
+                    }
+                    xIndex = int.Parse(temp[0]);
+                    yIndex = int.Parse(temp[1]);
+                    waferInfo.WriteWholeChipGridStatus(xIndex, yIndex, chipInfo);
+                }
+            }
+
         }
     }
 }

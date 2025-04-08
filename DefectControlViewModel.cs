@@ -19,37 +19,51 @@ namespace DefectViewProgram
             this.mainViewModel = mainVM;
         }
 
-        int currentWaferIndex = 0;
+        private int selectedIndex = 0;
+        public int SelectedIndex
+        {
+            get => selectedIndex;
+            set => selectedIndex = value;
+        }
+
+        private int chipSelectedIndex = 0;
+        public int ChipSelectedIndex
+        {
+            get => chipSelectedIndex; set => chipSelectedIndex = value;
+        }
+
 
         public void MoveToNextDefectOnWafer()
         {
+            if (mainViewModel.waferMapViewModel.IsChipSelect) return;
 
             if (mainViewModel.fileOpenViewModel.IsSelectedKlarfFile)
             {
-                currentWaferIndex = 0;
+                SelectedIndex = 0;
                 mainViewModel.fileOpenViewModel.IsSelectedKlarfFile = false;
                 mainViewModel.fileOpenViewModel.SelectedDefectIndex = 0;
             }
           
             if (mainViewModel.fileOpenViewModel.DefectList.Count == 0) return;
 
-            currentWaferIndex++;
+            SelectedIndex++;
 
-            if (currentWaferIndex >= mainViewModel.fileOpenViewModel.DefectList.Count)
+            if (SelectedIndex >= mainViewModel.fileOpenViewModel.DefectList.Count)
             {
-                currentWaferIndex = 0;
+                SelectedIndex = 0;
                 return;
             }
 
-            mainViewModel.fileOpenViewModel.SelectedDefectIndex = currentWaferIndex;
+            mainViewModel.fileOpenViewModel.SelectedDefectIndex = SelectedIndex;
 
-            mainViewModel.fileOpenViewModel.TextDefectOnWafer = $"전체 디펙: {currentWaferIndex+1}/{mainViewModel.fileOpenViewModel.DefectList.Count}";
+            mainViewModel.fileOpenViewModel.TextDefectOnWafer = $"Total Defect: {SelectedIndex + 1}/{mainViewModel.fileOpenViewModel.DefectList.Count}";
 
             // 메인 뷰모델을 통해 TiffImageLoaderViewModel 접근
             if (mainViewModel != null && mainViewModel.tiffLoaderViewModel != null)
             {
                 // 디펙트 ID 기반으로 이미지 로드
-                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(currentWaferIndex);
+                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(SelectedIndex);
+                UpdateWaferMapWithSelectedDefect(SelectedIndex);
             }
         }
 
@@ -68,34 +82,35 @@ namespace DefectViewProgram
 
         public void MoveToPreviousDefectOnWafer()
         {
+            if (mainViewModel.waferMapViewModel.IsChipSelect) return;
 
             if (mainViewModel.fileOpenViewModel.IsSelectedKlarfFile)
             {
-                currentWaferIndex = 0;
+                SelectedIndex = 0;
                 mainViewModel.fileOpenViewModel.IsSelectedKlarfFile = false;
                 mainViewModel.fileOpenViewModel.SelectedDefectIndex = 0;
             }
 
             if (mainViewModel.fileOpenViewModel.DefectList.Count == 0) return;
 
-            currentWaferIndex--;
+            SelectedIndex--;
 
-            if (currentWaferIndex < 0)
+            if (SelectedIndex < 0)
             {
-                currentWaferIndex = 0;
+                SelectedIndex = 0;
                 return;
             }
 
+            mainViewModel.fileOpenViewModel.SelectedDefectIndex = SelectedIndex;
 
-            mainViewModel.fileOpenViewModel.SelectedDefectIndex = currentWaferIndex;
-
-            mainViewModel.fileOpenViewModel.TextDefectOnWafer = $"전체 디펙: {currentWaferIndex+1}/{mainViewModel.fileOpenViewModel.DefectList.Count}";
+            mainViewModel.fileOpenViewModel.TextDefectOnWafer = $"Total Defect: {SelectedIndex+1}/{mainViewModel.fileOpenViewModel.DefectList.Count}";
 
             // 메인 뷰모델을 통해 TiffImageLoaderViewModel 접근
             if (mainViewModel != null && mainViewModel.tiffLoaderViewModel != null)
             {
                 // 디펙트 ID 기반으로 이미지 로드
-                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(currentWaferIndex);
+                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(SelectedIndex);
+                UpdateWaferMapWithSelectedDefect(SelectedIndex);
             }
         }
        
@@ -112,56 +127,229 @@ namespace DefectViewProgram
             }
         }
 
-        // DefectControlViewModel에 추가
-        public void OnDefectListSelectionChanged()
+        // 리스트 버튼을 클릭 -> 칩 선택시에는 선택되면 안됨
+        public void OnDefectListSelectionChangedWafer()
         {
-            int selectedIndex = mainViewModel.fileOpenViewModel.SelectedDefectIndex;
-            if (selectedIndex >= 0 && selectedIndex < mainViewModel.fileOpenViewModel.DefectList.Count)
-            {
-                currentWaferIndex = selectedIndex;
-                mainViewModel.fileOpenViewModel.TextDefectOnWafer =
-                    $"전체 디펙: {selectedIndex + 1}/{mainViewModel.fileOpenViewModel.DefectList.Count}";
+            //mainViewModel.fileOpenViewModel.DefectList[SelectedIndex].DefectId = mainViewModel.fileOpenViewModel.SelectedDefectIndex;
 
-                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(selectedIndex);
+            if (mainViewModel.waferMapViewModel.IsChipSelect)
+            {
+                OnDefectListSelectionChangedChip();
+                return;
+            }
+
+            if (SelectedIndex >= 0 && SelectedIndex < mainViewModel.fileOpenViewModel.DefectList.Count)
+            {
+                mainViewModel.fileOpenViewModel.TextDefectOnWafer =
+                    $"Total Defect: {SelectedIndex + 1}/{mainViewModel.fileOpenViewModel.DefectList.Count}";
+
+                SelectedIndex= mainViewModel.fileOpenViewModel.SelectedDefectIndex;
+
+                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(mainViewModel.fileOpenViewModel.DefectList[SelectedIndex].DefectId - 1);
+                UpdateWaferMapWithSelectedDefect(SelectedIndex);
             }
         }
 
-        private ICommand defectListSelectionChangedCommand;
-        public ICommand DefectListSelectionChangedCommand
+
+        private ICommand onDefectListSelectionChangedWaferCommand;
+        public ICommand OnDefectListSelectionChangedWaferCommand
         {
             get
             {
-                if (defectListSelectionChangedCommand == null)
+                if (onDefectListSelectionChangedWaferCommand == null)
                 {
-                    defectListSelectionChangedCommand = new RelayCommand(OnDefectListSelectionChanged);
+                    onDefectListSelectionChangedWaferCommand = new RelayCommand(OnDefectListSelectionChangedWafer);
                 }
-                return defectListSelectionChangedCommand;
+                return onDefectListSelectionChangedWaferCommand;
             }
         }
 
 
-        //public void PreviousDefectOnWholeWaferButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// 리스트에서 디펙 정보를 눌렀을 때
+        /// </summary>
+        public void OnDefectListSelectionChangedChip()
+        {
+            SelectedIndex = mainViewModel.fileOpenViewModel.SelectedDefectIndex;
+
+            if (SelectedIndex >= 0 && SelectedIndex < mainViewModel.fileOpenViewModel.DefectList.Count)
+            {
+                mainViewModel.fileOpenViewModel.TextDefectOnChip =
+                            $"Cell ({mainViewModel.waferMapViewModel.XSelectedIndex}, {mainViewModel.waferMapViewModel.YSelectedIndex}) Defect: {mainViewModel.fileOpenViewModel.SelectedDefectIndex + 1}/{mainViewModel.waferMapViewModel.CellDefect.Count}";
+
+                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(mainViewModel.fileOpenViewModel.DefectList[SelectedIndex].DefectId - 1);
+                UpdateWaferMapWithSelectedDefect(SelectedIndex);
+            }
+        }
+
+
+        // Defect 선택 시 웨이퍼 맵 업데이트
+        private void UpdateWaferMapWithSelectedDefect(int defectIndex)
+        {
+            if (defectIndex >= 0 && defectIndex < mainViewModel.fileOpenViewModel.DefectList.Count)
+            {
+                var defect = mainViewModel.fileOpenViewModel.DefectList[defectIndex];
+
+                // DefectInfo 객체의 XIndex와 YIndex 속성 사용
+                if (defect != null)
+                {
+                    // DefectInfo 클래스의 XIndex, YIndex가 int 타입이라면
+                    var coord = (defect.XIndex, defect.YIndex);
+
+                    // 웨이퍼 맵 뷰모델에 선택된 좌표 전달
+                    mainViewModel.waferMapViewModel.SetSelectedDefect(coord);
+                }
+            }
+        }
+
+        public void MoveToNextDefectOnChip()
+        {
+            // 칩이 선택되지 않았으면 실행하지 않음
+            if (!mainViewModel.waferMapViewModel.IsChipSelect) return;
+
+            // 유효한 결함 목록 확인
+            int defectCount = mainViewModel.waferMapViewModel.CellDefect.Count;
+            if (defectCount <= 0) return;
+
+            // 다음 결함으로 이동
+            SelectedIndex = (SelectedIndex == -1) ? 0 : SelectedIndex + 1;
+
+            // 인덱스가 범위를 넘어가면 첫 번째 결함으로 순환
+            if (SelectedIndex >= defectCount)
+                SelectedIndex = 0;
+
+            // 결함 정보 업데이트
+            mainViewModel.fileOpenViewModel.SelectedDefectIndex = SelectedIndex;
+
+            // 텍스트 정보 업데이트
+            mainViewModel.fileOpenViewModel.TextDefectOnChip =
+                $"Cell ({mainViewModel.waferMapViewModel.XSelectedIndex}, {mainViewModel.waferMapViewModel.YSelectedIndex}) " +
+                $"Defect: {SelectedIndex + 1}/{defectCount}";
+
+            // 결함 이미지 로드 (배열 범위 검사 추가)
+            if (SelectedIndex < mainViewModel.fileOpenViewModel.DefectList.Count)
+                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(
+                    mainViewModel.fileOpenViewModel.DefectList[SelectedIndex].DefectId - 1);
+        }
+
+
+        private ICommand moveToNextDefectOnChipCommand;
+        public ICommand MoveToNextDefectOnChipCommand
+        {
+            get
+            {
+                if (moveToNextDefectOnChipCommand == null)
+                {
+                    moveToNextDefectOnChipCommand = new RelayCommand(MoveToNextDefectOnChip);
+                }
+                return moveToNextDefectOnChipCommand;
+            }
+        }
+
+
+
+        public void MoveToPreviousDefectOnChip()
+        {
+            // 칩이 선택되지 않았으면 실행하지 않음
+            if (!mainViewModel.waferMapViewModel.IsChipSelect) return;
+
+            // 유효한 결함 목록 확인
+            int defectCount = mainViewModel.waferMapViewModel.CellDefect.Count;
+            if (defectCount <= 0) return;
+
+            // 이전 결함으로 이동 (순환 구현)
+            if (SelectedIndex <= 0)
+                SelectedIndex = defectCount - 1;  // 첫 번째에서 마지막으로 순환
+            else
+                SelectedIndex--;
+
+            // 인덱스가 범위를 넘어가면 첫 번째 결함으로 순환
+            if (SelectedIndex <= 0)
+                SelectedIndex = 0;
+
+            // 결함 정보 업데이트
+            mainViewModel.fileOpenViewModel.SelectedDefectIndex = SelectedIndex;
+
+            // 텍스트 정보 업데이트
+            mainViewModel.fileOpenViewModel.TextDefectOnChip =
+                $"Cell ({mainViewModel.waferMapViewModel.XSelectedIndex}, {mainViewModel.waferMapViewModel.YSelectedIndex}) " +
+                $"Defect: {SelectedIndex+1}/{defectCount}";
+
+            // 결함 이미지 로드 (배열 범위 검사 추가)
+            if (SelectedIndex < mainViewModel.fileOpenViewModel.DefectList.Count)
+                mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(
+                    mainViewModel.fileOpenViewModel.DefectList[SelectedIndex].DefectId - 1);
+        }
+
+
+        private ICommand moveToPreviousDefectOnChipCommand;
+        public ICommand MoveToPreviousDefectOnChipCommand
+        {
+            get
+            {
+                if (moveToPreviousDefectOnChipCommand == null)
+                {
+                    moveToPreviousDefectOnChipCommand = new RelayCommand(MoveToPreviousDefectOnChip);
+                }
+                return moveToPreviousDefectOnChipCommand;
+            }
+        }
+
+
+
+        //private ICommand defectListSelectionChangedChipCommand;
+        //public ICommand DefectListSelectionChangedChipCommand
+        //{
+        //    get
+        //    {
+        //        if (defectListSelectionChangedChipCommand == null)
+        //        {
+        //            defectListSelectionChangedChipCommand = new RelayCommand(OnDefectListSelectionChangedChip);
+        //        }
+        //        return defectListSelectionChangedChipCommand;
+        //    }
+        //}
+
+
+
+
+
+
+        //public void MoveToNextDefectOnChip()
         //{
 
-        //    //if (isChipDataView)
-        //    //{
-        //    //    return;
-        //    //}
-
-        //    if (currentWaferIndex > 0)
+        //    if (mainViewModel.waferMapViewModel.IsChipSelect)
         //    {
-        //        currentWaferIndex--;
+        //        return;
+        //    }
+
+        //    if (SelectedIndex > 0)
+        //    {
+        //        SelectedIndex--;
         //        wholeWaferDefectCount = defectList.Items.Count;
 
-        //        defectList.SelectedIndex = currentWaferIndex;
+        //        defectList.SelectedIndex = SelectedIndex;
 
-        //        txtDefectOnWafer.Text = $"전체 디펙: {currentWaferIndex + 1}/{wholeWaferDefectCount}";
-        //        //var vm = this.DataContext as TiffImageLoaderViewModel;
-        //        //vm.LoadDefectImageFromWholeSelected(currentWaferIndex);
+        //        mainViewModel.fileOpenViewModel.TextDefectOnWafer = $"전체 디펙: {SelectedIndex + 1}/{mainViewModel.fileOpenViewModel.DefectList.Count}";
         //        TiffImageLoaderViewModel loader = new TiffImageLoaderViewModel();
         //        loader.LoadTiffImage(CurrentFolderPath);
         //    }
         //}
+
+
+        //private ICommand moveToPreviousDefectOnChipCommand;
+        //public ICommand MoveToPreviousDefectOnChipCommand
+        //{
+        //    get
+        //    {
+        //        if (moveToPreviousDefectOnChipCommand == null)
+        //        {
+        //            moveToPreviousDefectOnChipCommand = new RelayCommand(MoveToPreviousDefectOnWafer);
+        //        }
+        //        return moveToPreviousDefectOnChipCommand;
+        //    }
+        //}
+
 
 
 
