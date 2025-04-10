@@ -285,5 +285,61 @@ namespace DefectViewProgram
                 return moveToPreviousDefectOnChipCommand;
             }
         }
+
+        public void MoveToNextKlarfFile()
+        {
+            var fileViewModel = mainViewModel.fileOpenViewModel;
+
+            if(fileViewModel.FileListBox.Items.Count <= fileViewModel.SelectedFileIndex)
+            {
+                fileViewModel.SelectedFileIndex = 0;
+            }
+            fileViewModel.FileListBox.SelectedItem = fileViewModel.FileListBox.Items[fileViewModel.SelectedFileIndex];   
+            fileViewModel.SelectedFileIndex++;
+
+            Console.WriteLine(fileViewModel.SelectedFileIndex);
+        }
+
+        private ICommand moveToNextKlarfFileCommand;
+        public ICommand MoveToNextKlarfFileCommand
+        {
+            get
+            {
+                if (moveToNextKlarfFileCommand == null)
+                {
+                    moveToNextKlarfFileCommand = new RelayCommand(MoveToNextKlarfFile);
+                }
+                return moveToNextKlarfFileCommand;
+            }
+        }
+
+
+        public void MoveToPreviousKlarfFile()
+        {
+            var fileViewModel = mainViewModel.fileOpenViewModel;
+
+            if (fileViewModel.SelectedFileIndex <= 0)
+            {
+                fileViewModel.SelectedFileIndex = fileViewModel.FileListBox.Items.Count;
+            }
+            fileViewModel.FileListBox.SelectedItem = fileViewModel.FileListBox.Items[fileViewModel.SelectedFileIndex-1];
+            fileViewModel.SelectedFileIndex--;
+
+            Console.WriteLine(fileViewModel.SelectedFileIndex);
+        }
+
+        private ICommand moveToPreviousKlarfFileCommand;
+        public ICommand MoveToPreviousKlarfFileCommand
+        {
+            get
+            {
+                if (moveToPreviousKlarfFileCommand == null)
+                {
+                    moveToPreviousKlarfFileCommand = new RelayCommand(MoveToPreviousKlarfFile);
+                }
+                return moveToPreviousKlarfFileCommand;
+            }
+        }
+
     }
 }

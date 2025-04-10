@@ -93,6 +93,15 @@ namespace DefectViewProgram
         }
 
 
+        private int selectedFileIndex;
+        // 선택된 Klarf 파일 인덱스
+        public int SelectedFileIndex
+        {
+            get => selectedFileIndex;
+            set => SetProperty(ref selectedFileIndex, value);
+        }
+
+
         public void OpenFolder()
         {
             var dialog = new WPFForms.FolderBrowserDialog();
@@ -284,6 +293,14 @@ namespace DefectViewProgram
         }
 
 
+        private string textKlarfFileNum = "Klarf File: ( / )";
+        public string TextKlarfFileNum
+        {
+            get => textKlarfFileNum;
+            set => SetProperty(ref textKlarfFileNum, value);
+        }
+
+
         private ICommand fileListSelectionChangedCommand;
         public ICommand FileListSelectionChangedCommand
         {
@@ -322,7 +339,6 @@ namespace DefectViewProgram
                 parser.ParseText(FullPath);
 
                 string defectInfo = chip.GetAllDefects();
-                Console.WriteLine($"DefectInfo: {defectInfo}");
 
                 string[] lines = defectInfo.Split('\n');
                 
@@ -359,8 +375,9 @@ namespace DefectViewProgram
 
                 SelectedIndex = 0;
                 IsSelectedKlarfFile = true;
-                SelectedDefectIndex = 1;
+                SelectedDefectIndex = 0;
                 TextDefectOnWafer = $"Total Defect: 1/{DefectList.Count}";
+                TextKlarfFileNum = $"Klarf File: {SelectedFileName}";
 
 
                 if (MainViewModel != null && MainViewModel.tiffLoaderViewModel != null)
@@ -381,6 +398,7 @@ namespace DefectViewProgram
             MainViewModel.waferMapViewModel.IsChipSelect = false;
 
             SelectedFileName = FileListBox.SelectedItem.ToString();
+            SelectedFileIndex = FileListBox.Items.IndexOf(FileListBox.SelectedItem);
             FullPath = Path.Combine(CurrentFolderPath, SelectedFileName);
 
             ChipInfo chip = new ChipInfo();
@@ -391,7 +409,6 @@ namespace DefectViewProgram
             parser.ParseText(FullPath);
 
             string defectInfo = chip.GetAllDefects();
-            Console.WriteLine($"DefectInfo: {defectInfo}");
 
             string[] lines = defectInfo.Split('\n');
 
