@@ -26,13 +26,34 @@
             </Border>
             <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1">
                 <Grid>
-                    <TextBlock x:Name="NoImageText" 
+                    <TextBlock x:Name="NoImageText"
+                       Visibility="Visible" 
                        Text="이미지가 없습니다." 
                        FontSize="10" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center"
-                       Visibility="Hidden"/>
-                    <Image x:Name="CurrentImage" Stretch="Uniform" Visibility="Visible" Source="{Binding tiffLoaderViewModel.CurrentImage}"/>
+                       />
+
+                    <Image x:Name="CurrentImage"
+                        Stretch="Uniform"
+                        Visibility="Visible"
+                        RenderTransformOrigin="0.5,0.5"
+                        Source="{Binding tiffLoaderViewModel.CurrentImage}">
+                        
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                            <ScaleTransform ScaleX="{Binding tiffLoaderViewModel.ScaleX}" ScaleY="{Binding tiffLoaderViewModel.ScaleY}"/>
+                                <TranslateTransform X="{Binding tiffLoaderViewModel.PointX}" Y="{Binding tiffLoaderViewModel.PointY}"/>
+                            </TransformGroup>
+                        </Image.RenderTransform>
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseWheel">
+                                <i:InvokeCommandAction Command="{Binding tiffLoaderViewModel.MouseWheelInAndOutCommand}"
+                                   PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Image>
                 </Grid>
             </Border>
 
@@ -106,8 +127,15 @@
                                 <TextBlock x:Name="TextDefectOnChip" Text="{Binding fileOpenViewModel.TextDefectOnChip}" VerticalAlignment="Center" Margin="10,0"/>
                                 <Button Content="▶" Width="40" Height="30" Margin="5" Command="{Binding defectControlViewModel.MoveToNextDefectOnChipCommand}"/>
                             </StackPanel>
+                            
+                            <!--Klarf File UI 마크-->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+                                <Button Content="◀" Width="40" Height="30" Margin="5" Command="{Binding defectControlViewModel.MoveToPreviousKlarfFileCommand}"/>
+                                <TextBlock x:Name="TextKlarfFileNum" Width = "160" Text="{Binding fileOpenViewModel.TextKlarfFileNum}" VerticalAlignment="Center" Margin="10,0"/>
+                                <Button Content="▶" Width="40" Height="30" Margin="5" Command="{Binding defectControlViewModel.MoveToNextKlarfFileCommand}"/>
+                            </StackPanel>
 
-                             <!--칩 디펙 조회 입력--> 
+                            <!--전체 디펙으로 전환--> 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
                                 <Button Content="전체 Defect 조회" Width="100" Height="30" Margin="5" Command="{Binding fileOpenViewModel.ShowAllListCommand}"/>
                             </StackPanel>

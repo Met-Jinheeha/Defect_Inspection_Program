@@ -152,6 +152,10 @@ namespace DefectViewProgram
                             mainViewModel.tiffLoaderViewModel.LoadDefectImageFromWholeSelected(
                                 mainViewModel.fileOpenViewModel.DefectList[0].DefectId - 1);
                         }
+                        else
+                        {
+                            mainViewModel.tiffLoaderViewModel.CurrentImage = null;
+                        }
 
                         var coord = (XSelectedIndex, YSelectedIndex);
                         SetSelectedDefect(coord);
@@ -254,8 +258,6 @@ namespace DefectViewProgram
                         StrokeThickness = 0.5,
                         Tag = coord // 좌표 정보 저장
                     };
-
-                    //rect.MouseLeftButtonDown += OnCellClick;
 
                     Canvas.SetLeft(rect, x);
                     Canvas.SetTop(rect, y);

@@ -18,6 +18,7 @@ namespace DefectViewProgram
         public MainWindow()
         {
             InitializeComponent();
+            this.WindowState = WindowState.Maximized;
 
             // MainViewModel 인스턴스를 생성해 DataContext에 할당
             var mainViewModel = new MainViewModel();

@@ -40,7 +40,6 @@ namespace DefectViewProgram
             {
               chipInfoList[key] = "X"; // 불량있음
             }
-            Console.WriteLine($"정상불량 판정 메서드 확인용: {key}, {chipInfoList[key]}");
         }
     }
 }
