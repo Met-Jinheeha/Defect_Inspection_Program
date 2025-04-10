@@ -84,8 +84,7 @@ namespace DefectViewProgram
             RecipeInfo recipeInfo = new RecipeInfo(sampleInfo);
             recipeText = recipeInfo.ToString();
 
-            waferInfo = new WaferInfo(recipeInfo);
-
+           
             int xIndex = 0;
             int yIndex = 0;
 
@@ -102,6 +101,8 @@ namespace DefectViewProgram
                 }
             }
 
+            waferInfo = new WaferInfo(recipeInfo, chipInfo);
+
             if (gridLineList != -1)
             {
                 for (int i = gridLineList + 1; i < gridListEndLine; i++)
@@ -113,7 +114,7 @@ namespace DefectViewProgram
                     }
                     xIndex = int.Parse(temp[0]);
                     yIndex = int.Parse(temp[1]);
-                    waferInfo.WriteWholeChipGridStatus(xIndex, yIndex, chipInfo);
+                    waferInfo.WriteWholeChipGridStatus(xIndex, yIndex);
                 }
             }
 

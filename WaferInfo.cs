@@ -8,17 +8,16 @@ namespace DefectViewProgram
 {
     public class WaferInfo
     {
-        private RecipeInfo recipeText; 
+        private RecipeInfo recipeText;
 
-        public WaferInfo(RecipeInfo recipeInfo)
-        {
-            this.recipeText = recipeInfo;
-        }
+        private ChipInfo chipInfo;
 
         public Dictionary<(int, int), List<DefectInfo>> chipDefectsInfo = new Dictionary<(int, int), List<DefectInfo>>();
-        public WaferInfo(ChipInfo chipInfo)
+        public WaferInfo(RecipeInfo recipeInfo, ChipInfo chipInfo)
         {
+            this.recipeText = recipeInfo;
             this.chipDefectsInfo = chipInfo.chipDefects;
+            this.chipInfo = chipInfo;
         }
 
         public Dictionary<(int, int), string> chipInfoList = new Dictionary<(int, int), string>();
@@ -28,7 +27,7 @@ namespace DefectViewProgram
         /// 전체 칩이 뭐가 있는지 입력하는 용도겸, 칩이 불량인지 확인하는 딕셔너리
         /// </summary>
 
-        public void WriteWholeChipGridStatus(int xIndex, int yIndex, ChipInfo chipInfo)
+        public void WriteWholeChipGridStatus(int xIndex, int yIndex)
         {
             var key = (xIndex, yIndex);
 
@@ -37,7 +36,7 @@ namespace DefectViewProgram
                 chipInfoList[key] = "O"; // 정상
             }
        
-            if (chipInfo.chipDefects.ContainsKey(key))
+            if (chipDefectsInfo.ContainsKey(key))
             {
               chipInfoList[key] = "X"; // 불량있음
             }

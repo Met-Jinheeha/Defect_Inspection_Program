@@ -69,20 +69,6 @@ namespace DefectViewProgram
         }
 
 
-        // 셀 클릭 커맨드
-        private ICommand cellClickCommand;
-        public ICommand CellClickCommand
-        {
-            get
-            {
-                if (cellClickCommand == null)
-                {
-                    cellClickCommand = new RelayCommand<object>(ExecuteCellClick);
-                }
-                return cellClickCommand;
-            }
-        }
-
         private List<DefectInfo> cellDefects;
         public  List<DefectInfo> CellDefect
         {
@@ -105,12 +91,25 @@ namespace DefectViewProgram
 
         }
 
+        // 셀 클릭 커맨드
+        private ICommand cellClickCommand;
+        public ICommand CellClickCommand
+        {
+            get
+            {
+                if (cellClickCommand == null)
+                {
+                    cellClickCommand = new RelayCommand<object>(ExecuteCellClick);
+                }
+                return cellClickCommand;
+            }
+        }
 
         /// <summary>
-        /// 웨이퍼 맵에서 그리드를 눌렀을 때
+        /// 웨이퍼 맵에서 그리드를 눌렀을 때 작동
         /// </summary>
-        /// <param name="parameter"></param>
-        private void ExecuteCellClick(object parameter)
+        /// 
+        public void ExecuteCellClick(object parameter)
         {
             IsChipSelect = true;
 
@@ -133,11 +132,15 @@ namespace DefectViewProgram
                             mainViewModel.fileOpenViewModel.DefectList.Add(defect);
                         }
 
-                        int SelectedDefectCount = mainViewModel.defectControlViewModel.SelectedIndex;
+                        int SelectedDefectCount;
 
                         if (CellDefect.Count == 0)
                         {
                             SelectedDefectCount = -1;
+                        }
+                        else
+                        {
+                            SelectedDefectCount = 0;
                         }
 
                         mainViewModel.defectControlViewModel.ChipSelectedIndex = 0;

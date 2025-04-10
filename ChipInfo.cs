@@ -40,12 +40,6 @@ namespace DefectViewProgram
             return chipDefects.ContainsKey(key) ? chipDefects[key] : new List<DefectInfo>();
         }
 
-        public bool HasChipDefect(int xIndex, int yIndex)
-        {
-            var key = (xIndex, yIndex);
-            return chipDefects.ContainsKey(key) ? true : false;
-        }
-
         public void ChipDefectClear()
         {
             chipDefects.Clear();
