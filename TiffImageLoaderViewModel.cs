@@ -13,10 +13,17 @@ namespace DefectViewProgram
     {
 
         private BitmapSource currentImage;
+        //public BitmapSource CurrentImage
+        //{
+        //    get { return currentImage; }
+        //    set { SetProperty(ref currentImage, value); } // 이미지 바뀔때 SetProperty 호출 
+        //}
+
         public BitmapSource CurrentImage
         {
-            get { return currentImage; }
-            set { SetProperty(ref currentImage, value); } // 이미지 바뀔때 SetProperty 호출 
+            get { return currentImage;  }
+            set { SetProperty(ref currentImage, value); }
+            // 이미지 바뀔때 SetProperty 호출 
         }
 
         /// <summary>

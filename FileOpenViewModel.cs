@@ -84,27 +84,14 @@ namespace DefectViewProgram
             set => SetProperty(ref isSelectedKlarfFile, value);
         }
 
-
-        // 전체 디펙개수
-        public int wholeWaferDefectCount = 0;
-
+        private int selectedIndex;
         // 전체 칩 인덱스
-        public int SelectedIndex = 0;
-
-        // 칩 내부 디펙 현재 인덱스
-        public int currentChipDefectIndex = 0;
-
-        // 선택된 Tiff 이미지 인덱스
-        public int currentImageIndex = 0;
-
-
-        private string buttonMessage = "폴더선택을로직에서";
-        public string ButtonMessage
+        public int SelectedIndex
         {
-            get { return buttonMessage; }
-            set { SetProperty(ref buttonMessage, value); }
-
+            get => selectedIndex;
+            set => SetProperty(ref selectedIndex, value);
         }
+
 
         public void OpenFolder()
         {
@@ -128,9 +115,6 @@ namespace DefectViewProgram
                 return openFolderCommand;
             }
         }
-
-
-
 
         public void LoadFolders(string path) // 탐색기에서 폴더 선택했을때
         {
@@ -374,9 +358,8 @@ namespace DefectViewProgram
                 FileSelected?.Invoke(CurrentFolderPath);
 
                 SelectedIndex = 0;
-                currentChipDefectIndex = 0;
                 IsSelectedKlarfFile = true;
-                SelectedDefectIndex = 3;
+                SelectedDefectIndex = 1;
                 TextDefectOnWafer = $"Total Defect: 1/{DefectList.Count}";
 
 
