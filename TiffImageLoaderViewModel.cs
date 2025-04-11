@@ -130,37 +130,22 @@ namespace DefectViewProgram
             }
         }
 
-        private void MouseWheelInAndOut(object parameter)
-        {
-            if (parameter is MouseWheelEventArgs e)
-            {
-                double zoom = e.Delta > 0 ? 1.1 : 0.9;
-                ScaleX *= zoom;
-                ScaleY *= zoom;
 
-                UIElement element = e.Source as UIElement;
-                Point mousePosition = e.GetPosition(element);
 
-                // mousePosition.X와 mousePosition.Y로 마우스 위치 사용
-                PointX = mousePosition.X;
-                PointY = mousePosition.Y;
-
-            }
-        }
 
         // 이미지 확대 커맨드
-        private ICommand mouseWheelInAndOutCommand;
-        public ICommand MouseWheelInAndOutCommand
-        {
-            get
-            {
-                if (mouseWheelInAndOutCommand == null)
-                {
-                    mouseWheelInAndOutCommand = new RelayCommand<object>(MouseWheelInAndOut);
-                }
-                return mouseWheelInAndOutCommand;
-            }
-        }
+        //private ICommand mouseWheelInAndOutCommand;
+        //public ICommand MouseWheelInAndOutCommand
+        //{
+        //    get
+        //    {
+        //        if (mouseWheelInAndOutCommand == null)
+        //        {
+        //            mouseWheelInAndOutCommand = new RelayCommand<object>(MouseWheelInAndOut);
+        //        }
+        //        return mouseWheelInAndOutCommand;
+        //    }
+        //}
 
 
     }
